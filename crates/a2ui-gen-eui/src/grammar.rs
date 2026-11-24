@@ -48,6 +48,7 @@ path ::= "$" [A-Za-z0-9_/]*
 abspath ::= "$/" | "$" ("/" [A-Za-z0-9_]+)+
 "#;
 
+// Lengths are bounded, so a model caught in a loop cannot spend a whole reply on one name or number.
 // The lexer matches greedily, so a string is one terminal for all four forms.
 const LARK_TOKENS: &str = r#"
 ident: IDENT
@@ -55,11 +56,11 @@ string: STRING
 number: NUMBER
 path: PATH
 abspath: ABSPATH
-IDENT: /[\p{XID_Start}_][\p{XID_Continue}]*/
+IDENT: /[\p{XID_Start}_][\p{XID_Continue}]{0,255}/
 STRING: /"""([^"\\]|\\[^\n]|"[^"\\]|""[^"\\])*"""|r"""([^"]|"[^"]|""[^"])*"""|r"[^"\n]*"|"([^"\\\n]|\\[^\n])*"/
-NUMBER: /-?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?/
-PATH: /\$[A-Za-z0-9_\/]*/
-ABSPATH: /\$(\/|(\/[A-Za-z0-9_]+)+)/
+NUMBER: /-?[0-9]{1,20}(\.[0-9]{1,20})?([eE][-+]?[0-9]{1,3})?/
+PATH: /\$(\/?[A-Za-z0-9_]{1,64}(\/[A-Za-z0-9_]{1,64}){0,7}|\/)?/
+ABSPATH: /\$(\/|(\/[A-Za-z0-9_]{1,64}){1,8})/
 "#;
 
 #[derive(Clone, Copy, PartialEq)]
