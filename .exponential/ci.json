@@ -7,7 +7,7 @@
     "push": { "branches": ["main"] },
     "manual": {}
   },
-  "env": { "CI": "true", "CARGO_TERM_COLOR": "never", "CARGO_BUILD_JOBS": "8" },
+  "env": { "CI": "true", "CARGO_TERM_COLOR": "never", "CARGO_BUILD_JOBS": "4" },
   "jobs": {
     "test": {
       "name": "ecode test",
