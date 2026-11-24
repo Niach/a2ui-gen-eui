@@ -329,8 +329,12 @@ fn worker(
 
 fn load_model(path: &Path, options: &LoadOptions) -> Result<LlamaModel> {
     let params = LlamaModelParams::default().with_n_gpu_layers(options.gpu_layers);
-    LlamaModel::load_from_file(backend()?, path, &params)
-        .map_err(|e| Error::Model(format!("{}: {e}", path.display())))
+    LlamaModel::load_from_file(backend()?, path, &params).map_err(|e| {
+        Error::Model(format!(
+            "{}: {e} (A2UI_GEN_EUI_LOG=1 shows llama.cpp's log)",
+            path.display()
+        ))
+    })
 }
 
 struct Grammar {

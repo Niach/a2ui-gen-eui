@@ -1,8 +1,11 @@
-//! cargo run --release --example bench -- MODEL.gguf [THREADS] [MAX_TOKENS] [grammar,gbnf,free]
+//! cargo run --release --example bench -- MODEL.gguf [THREADS] [MAX_TOKENS] [grammar,gbnf,free] [Component,…]
+//!
+//! With a list of components the catalog is cut down to them and goes into the prompt, for a model that does
+//! not know eui's.
 //!
 //! Tokens/s, time to the first block and validity, with and without grammar, on five requests.
 
-use a2ui_gen_eui::{Decoding, Error, ExpressBlock, Generator, LoadOptions, Options};
+use a2ui_gen_eui::{Catalog, Decoding, Error, ExpressBlock, Generator, LoadOptions, Options};
 
 const REQUESTS: [&str; 5] = [
     "A login screen with email, password, a forgot-password link and a sign-in button.",
@@ -20,6 +23,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let threads: usize = args.next().map_or(Ok(8), |a| a.parse())?;
     let max_tokens: usize = args.next().map_or(Ok(512), |a| a.parse())?;
     let only = args.next().unwrap_or_else(|| "grammar,gbnf,free".into());
+    let catalog = match args.next() {
+        None => Catalog::eui(),
+        Some(names) => {
+            let names: Vec<&str> = names.split(',').collect();
+            let mut doc = Catalog::eui().document().clone();
+            doc["components"]
+                .as_object_mut()
+                .expect("a map")
+                .retain(|k, _| names.contains(&k.as_str()));
+            Catalog::from_json(doc)?
+        }
+    };
     let load = std::time::Instant::now();
     let generator = Generator::load_with(
         model,
@@ -53,7 +68,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             let started = std::time::Instant::now();
             let mut first_at = None;
-            for block in generator.generate_with(request, None, None, options)?.blocking() {
+            for block in generator
+                .generate_with(request, None, Some(&catalog), options)?
+                .blocking()
+            {
                 match block {
                     Ok(ExpressBlock::Statement { kind, .. })
                         if kind != a2ui_gen_eui::StatementKind::Surface =>
@@ -79,7 +97,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         decode += stats.decode_ms;
                         sample += stats.sample_ms;
                         prompt.push(stats.prompt_ms);
-                        eprintln!("{decoding:?} {i}: {message}");
+                        let head: String = reply.chars().take(200).collect();
+                        eprintln!("{decoding:?} {i}: {message}\n{head}");
                     }
                     Err(Error::NoValidReply { .. }) => {}
                     Err(e) => return Err(e.into()),
