@@ -1,18 +1,28 @@
 {
-  "$comment": "Our own CI (eCode). Tests need no model and no GPU. The other platforms are built by .github/workflows/ci.yml.",
+  "$comment": "Our own CI (eCode): the light checks. Tests need no model. llama.cpp (inference) is built by .github/workflows/ci.yml on hosted runners, Linux included: it is too heavy for a shared machine.",
   "version": 1,
   "name": "ecode",
   "on": {
     "pull_request": {},
-    "push": { "branches": ["main"] },
+    "push": {
+      "branches": [
+        "main"
+      ]
+    },
     "manual": {}
   },
-  "env": { "CI": "true", "CARGO_TERM_COLOR": "never", "CARGO_BUILD_JOBS": "4" },
+  "env": {
+    "CI": "true",
+    "CARGO_TERM_COLOR": "never",
+    "CARGO_BUILD_JOBS": "4"
+  },
   "jobs": {
     "test": {
       "name": "ecode test",
-      "runsOn": ["linux"],
-      "timeoutMin": 60,
+      "runsOn": [
+        "linux"
+      ],
+      "timeoutMin": 30,
       "steps": [
         {
           "name": "Format",
@@ -20,11 +30,7 @@
         },
         {
           "name": "Test without inference",
-          "run": "export PATH=\"$HOME/.cargo/bin:$PATH\"\ncargo test --locked --workspace --no-default-features --features a2ui-gen-eui/download,a2ui-gen-eui-mcp/http"
-        },
-        {
-          "name": "Build llama.cpp and test with inference",
-          "run": "export PATH=\"$HOME/.cargo/bin:$PATH\"\ncommand -v cmake || { echo 'this runner has no cmake' >&2; exit 1; }\nexport BINDGEN_EXTRA_CLANG_ARGS=\"-I$(gcc -print-file-name=include)\"\ncargo clippy --locked --workspace --all-targets -- -D warnings\ncargo test --locked --workspace"
+          "run": "export PATH=\"$HOME/.cargo/bin:$PATH\"\ncargo clippy --locked --workspace --all-targets --no-default-features --features a2ui-gen-eui/download,a2ui-gen-eui-mcp/http -- -D warnings\ncargo test --locked --workspace --no-default-features --features a2ui-gen-eui/download,a2ui-gen-eui-mcp/http"
         }
       ]
     }
