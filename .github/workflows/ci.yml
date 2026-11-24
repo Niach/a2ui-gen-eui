@@ -39,6 +39,8 @@ jobs:
           export ANDROID_NDK="$ANDROID_NDK_LATEST_HOME"
           export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang"
           export CC_aarch64_linux_android="$CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER"
+          export CXX_aarch64_linux_android="${CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER}++"
+          export AR_aarch64_linux_android="$(dirname "$CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER")/llvm-ar"
           bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui --target aarch64-linux-android
         env:
           ANDROID_API_LEVEL: "28"
