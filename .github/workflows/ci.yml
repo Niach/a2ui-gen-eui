@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, windows-2022]
+        os: [macos-15, windows-2022]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
@@ -21,7 +21,7 @@ jobs:
       - run: bash scripts/ci-annotate.sh cargo test --locked --workspace
       - run: bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui-mcp
   ios:
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
