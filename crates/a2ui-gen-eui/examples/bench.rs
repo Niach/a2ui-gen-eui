@@ -74,7 +74,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             {
                 match block {
                     Ok(ExpressBlock::Statement { kind, .. })
-                        if kind != a2ui_gen_eui::StatementKind::Surface =>
+                        if matches!(kind, a2ui_gen_eui::StatementKind::Component { .. }) =>
                     {
                         first_at.get_or_insert(started.elapsed().as_secs_f64() * 1e3);
                     }

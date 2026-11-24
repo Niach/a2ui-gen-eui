@@ -107,7 +107,8 @@ pub struct Stats {
     pub cached_tokens: usize,
     /// Reading the prompt.
     pub prompt_ms: f64,
-    /// From the start to the first component or data statement.
+    /// From the start to the first component, `root`: from here on the surface renders. Data lines may come
+    /// before it.
     pub first_block_ms: Option<f64>,
     /// Sampled tokens, all attempts.
     pub tokens: usize,
@@ -142,9 +143,10 @@ pub struct Ui {
 /// An item of a [`Generation`].
 #[derive(Debug, Clone)]
 pub enum ExpressBlock {
-    /// A statement is complete. The first component is always `root`.
+    /// A statement is complete. The first component is always `root`; data lines may come before it.
     Statement { kind: StatementKind, source: String },
     /// A2UI messages that are ready for the renderer; a surface renders progressively from these alone.
+    /// The first ones come with `root` and hold the data read before it.
     Messages(Vec<Value>),
     /// The attempt was invalid: discard what came so far (delete the surface); a new attempt follows.
     Restart { attempt: u32, reason: String },
@@ -576,31 +578,33 @@ impl<'m> Session<'m> {
         };
         let mut reading = catalog.open_stream();
         let mut seen: HashMap<String, u32> = HashMap::new();
-        let mut emit =
-            |reading: &mut crate::stream::ReplyStream, text: &str, stats: &mut Stats| -> Result<()> {
-                for chunk in reading.push(text)? {
-                    let block = match chunk {
-                        Chunk::Messages(m) => ExpressBlock::Messages(m),
-                        Chunk::Statement(source) => {
-                            // A model caught in a loop would run to the token limit.
-                            let times = seen.entry(source.clone()).or_default();
-                            *times += 1;
-                            if *times == MAX_REPEATS {
-                                return Err(Error::Invalid(format!("the reply repeats itself: {source}")));
-                            }
-                            let kind = StatementKind::of(&source);
-                            if kind != StatementKind::Surface && stats.first_block_ms.is_none() {
-                                stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
-                            }
-                            ExpressBlock::Statement { kind, source }
+        let mut emit = |reading: &mut crate::stream::ReplyStream,
+                        text: &str,
+                        stats: &mut Stats|
+         -> Result<()> {
+            for chunk in reading.push(text)? {
+                let block = match chunk {
+                    Chunk::Messages(m) => ExpressBlock::Messages(m),
+                    Chunk::Statement(source) => {
+                        // A model caught in a loop would run to the token limit.
+                        let times = seen.entry(source.clone()).or_default();
+                        *times += 1;
+                        if *times == MAX_REPEATS {
+                            return Err(Error::Invalid(format!("the reply repeats itself: {source}")));
                         }
-                    };
-                    if tx.send_blocking(Ok(block)).is_err() {
-                        return Err(Error::Cancelled);
+                        let kind = StatementKind::of(&source);
+                        if matches!(kind, StatementKind::Component { .. }) && stats.first_block_ms.is_none() {
+                            stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
+                        }
+                        ExpressBlock::Statement { kind, source }
                     }
+                };
+                if tx.send_blocking(Ok(block)).is_err() {
+                    return Err(Error::Cancelled);
                 }
-                Ok(())
-            };
+            }
+            Ok(())
+        };
 
         // The grammar leaves no choice in how a reply starts, so it is read along with the prompt.
         let mut pending = vec![last];
