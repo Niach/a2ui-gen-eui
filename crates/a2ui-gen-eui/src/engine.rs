@@ -578,6 +578,12 @@ impl<'m> Session<'m> {
                     let block = match chunk {
                         Chunk::Messages(m) => ExpressBlock::Messages(m),
                         Chunk::Statement(source) => {
+                            // A model caught in a loop would run to the token limit.
+                            let times = seen.entry(source.clone()).or_default();
+                            *times += 1;
+                            if *times == MAX_REPEATS {
+                                return Err(Error::Invalid(format!("the reply repeats itself: {source}")));
+                            }
                             let kind = StatementKind::of(&source);
                             if kind != StatementKind::Surface && stats.first_block_ms.is_none() {
                                 stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
