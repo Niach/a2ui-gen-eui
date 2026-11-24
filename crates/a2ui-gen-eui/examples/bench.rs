@@ -73,9 +73,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .blocking()
             {
                 match block {
-                    Ok(ExpressBlock::Statement { kind, .. })
-                        if matches!(kind, a2ui_gen_eui::StatementKind::Component { .. }) =>
-                    {
+                    Ok(ExpressBlock::Statement {
+                        kind: a2ui_gen_eui::StatementKind::Component { .. },
+                        ..
+                    }) => {
                         first_at.get_or_insert(started.elapsed().as_secs_f64() * 1e3);
                     }
                     Ok(ExpressBlock::Complete(ui)) if i > 0 => {
