@@ -1,5 +1,6 @@
 //! llama.cpp inference. One worker thread owns the model; generations queue on it.
 
+use std::collections::HashMap;
 use std::num::NonZeroU32;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
@@ -29,6 +30,8 @@ use crate::stream::Chunk;
 use crate::{Catalog, Error, Result, StatementKind, Validated, prompt};
 
 const BATCH: usize = 512;
+/// The same statement this often means the reply is stuck.
+const MAX_REPEATS: u32 = 3;
 /// Compiled grammars kept per generator.
 const GRAMMARS: usize = 4;
 
@@ -568,24 +571,26 @@ impl<'m> Session<'m> {
             _ => None,
         };
         let mut reading = catalog.open_stream();
-        let emit = |reading: &mut crate::stream::ReplyStream, text: &str, stats: &mut Stats| -> Result<()> {
-            for chunk in reading.push(text)? {
-                let block = match chunk {
-                    Chunk::Messages(m) => ExpressBlock::Messages(m),
-                    Chunk::Statement(source) => {
-                        let kind = StatementKind::of(&source);
-                        if kind != StatementKind::Surface && stats.first_block_ms.is_none() {
-                            stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
+        let mut seen: HashMap<String, u32> = HashMap::new();
+        let mut emit =
+            |reading: &mut crate::stream::ReplyStream, text: &str, stats: &mut Stats| -> Result<()> {
+                for chunk in reading.push(text)? {
+                    let block = match chunk {
+                        Chunk::Messages(m) => ExpressBlock::Messages(m),
+                        Chunk::Statement(source) => {
+                            let kind = StatementKind::of(&source);
+                            if kind != StatementKind::Surface && stats.first_block_ms.is_none() {
+                                stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
+                            }
+                            ExpressBlock::Statement { kind, source }
                         }
-                        ExpressBlock::Statement { kind, source }
+                    };
+                    if tx.send_blocking(Ok(block)).is_err() {
+                        return Err(Error::Cancelled);
                     }
-                };
-                if tx.send_blocking(Ok(block)).is_err() {
-                    return Err(Error::Cancelled);
                 }
-            }
-            Ok(())
-        };
+                Ok(())
+            };
 
         // The grammar leaves no choice in how a reply starts, so it is read along with the prompt.
         let mut pending = vec![last];

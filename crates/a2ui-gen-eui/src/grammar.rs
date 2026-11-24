@@ -22,6 +22,9 @@ anylist ::= "[" (any ("," ws any)*)? "]"
 anymap ::= "{" (key ":" ws any ("," ws key ":" ws any)*)? "}"
 any ::= string | number | boolean | "null" | path | event | template | call | anylist | anymap | ident | check
 check ::= "?" fname ("(" (arg ("," ws arg)*)? ")")?
+dataval ::= string | number | boolean | "null" | path | event | template | call | datalist | datamap | check
+datalist ::= "[" (dataval ("," ws dataval)*)? "]"
+datamap ::= "{" (key ":" ws dataval ("," ws key ":" ws dataval)*)? "}"
 checks ::= check | "[" (check ("," ws check)*)? "]"
 event ::= "Event(" string ("," ws anymap)? ("," ws "userMessage=" (string | path | call))? ")"
 action ::= event | call | "[" (event | call) ("," ws (event | call))* "]" | anymap
@@ -42,7 +45,7 @@ char ::= [^"\\\n] | "\\" [^\n]
 tchar ::= [^"\\] | "\\" [^\n] | "\"" [^"\\] | "\"\"" [^"\\]
 number ::= "-"? [0-9]+ ("." [0-9]+)? ([eE] [-+]? [0-9]+)?
 path ::= "$" [A-Za-z0-9_/]*
-abspath ::= "$/" [A-Za-z0-9_/]*
+abspath ::= "$/" | "$" ("/" [A-Za-z0-9_]+)+
 "#;
 
 // The lexer matches greedily, so a string is one terminal for all four forms.
@@ -56,7 +59,7 @@ IDENT: /[\p{XID_Start}_][\p{XID_Continue}]*/
 STRING: /"""([^"\\]|\\[^\n]|"[^"\\]|""[^"\\])*"""|r"""([^"]|"[^"]|""[^"])*"""|r"[^"\n]*"|"([^"\\\n]|\\[^\n])*"/
 NUMBER: /-?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?/
 PATH: /\$[A-Za-z0-9_\/]*/
-ABSPATH: /\$\/[A-Za-z0-9_\/]*/
+ABSPATH: /\$(\/|(\/[A-Za-z0-9_]+)+)/
 "#;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -335,7 +338,7 @@ impl<'a> Builder<'a> {
         let mut out = format!(
             "{start} ::= {} (data \"\\n\")* \"root = \" component \"\\n\" (stmt \"\\n\")* \"</a2ui>\"\n\
              stmt ::= data | ident \" = \" component\n\
-             data ::= abspath \" = \" any\n\
+             data ::= abspath \" = \" dataval\n\
              component ::= {}\n\
              fname ::= {}\n",
             lit(crate::prompt::REPLY_START),

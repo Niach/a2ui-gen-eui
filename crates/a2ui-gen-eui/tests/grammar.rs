@@ -39,7 +39,9 @@ fn refuses_what_the_catalog_does_not_define() {
         "root = Text(text=nope(1))",                 // unknown function
         "a = Text(text=\"a\")",                      // root is not first
         "root = Text(text=\"a)",                     // open string
-        "root = Text(text=$/a-b)",                   // not a path
+        "$//a = 1\nroot = Text(text=$/a)",
+        "$/a = root\nroot = Text(text=$/a)",
+        "root = Text(text=$/a-b)", // not a path
         "root = Text(text=\"a\"); b = Text(text=\"b\")",
     ] {
         assert!(accepts(&g, &reply(bad)).is_err(), "{bad}");

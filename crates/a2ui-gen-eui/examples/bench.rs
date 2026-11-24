@@ -1,4 +1,4 @@
-//! cargo run --release --example bench -- MODEL.gguf [THREADS] [MAX_TOKENS]
+//! cargo run --release --example bench -- MODEL.gguf [THREADS] [MAX_TOKENS] [grammar,gbnf,free]
 //!
 //! Tokens/s, time to the first block and validity, with and without grammar, on five requests.
 
@@ -16,9 +16,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
     let model = args
         .next()
-        .ok_or("usage: bench MODEL.gguf [THREADS] [MAX_TOKENS]")?;
+        .ok_or("usage: bench MODEL.gguf [THREADS] [MAX_TOKENS] [grammar,gbnf,free]")?;
     let threads: usize = args.next().map_or(Ok(8), |a| a.parse())?;
     let max_tokens: usize = args.next().map_or(Ok(512), |a| a.parse())?;
+    let only = args.next().unwrap_or_else(|| "grammar,gbnf,free".into());
     let load = std::time::Instant::now();
     let generator = Generator::load_with(
         model,
@@ -36,6 +37,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "decoding | tokens/s | sampling ms/token | prompt ms | first block ms (median) | valid / complete / requests"
     );
     for decoding in [Decoding::Grammar, Decoding::Gbnf, Decoding::Free] {
+        if !only.contains(&format!("{decoding:?}").to_lowercase()) {
+            continue;
+        }
         let (mut first, mut valid, mut complete) = (Vec::new(), 0, 0);
         let (mut tokens, mut decode, mut sample, mut prompt) = (0, 0.0, 0.0, Vec::new());
         // The first request warms up: grammar compilation, system prompt cache.
