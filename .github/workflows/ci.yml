@@ -1,0 +1,54 @@
+name: platforms
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash scripts/ci-annotate.sh cargo clippy --locked --workspace --all-targets -- -D warnings
+      - run: bash scripts/ci-annotate.sh cargo test --locked --workspace
+      - run: bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui-mcp
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - run: rustup target add aarch64-apple-ios
+      - run: bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui --target aarch64-apple-ios --features metal
+        env:
+          IPHONEOS_DEPLOYMENT_TARGET: "16.4"
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - run: rustup target add aarch64-linux-android
+      - run: |
+          export ANDROID_NDK="$ANDROID_NDK_LATEST_HOME"
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang"
+          export CC_aarch64_linux_android="$CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER"
+          export CXX_aarch64_linux_android="${CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER}++"
+          export AR_aarch64_linux_android="$(dirname "$CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER")/llvm-ar"
+          bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui --target aarch64-linux-android
+        env:
+          ANDROID_API_LEVEL: "28"
+  vulkan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y libvulkan-dev glslc spirv-headers
+      - run: bash scripts/ci-annotate.sh cargo check --locked --workspace --features a2ui-gen-eui/vulkan

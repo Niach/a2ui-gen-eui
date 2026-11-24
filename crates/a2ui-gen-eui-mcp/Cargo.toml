@@ -1,0 +1,35 @@
+[package]
+name = "a2ui-gen-eui-mcp"
+description = "MCP server that generates A2UI Express user interfaces with a local model"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+default = ["llama", "http"]
+llama = ["a2ui-gen-eui/llama"]
+# Streamable HTTP transport, on loopback.
+http = ["dep:tiny_http"]
+# The `download` command.
+download = ["a2ui-gen-eui/download"]
+cuda = ["a2ui-gen-eui/cuda"]
+metal = ["a2ui-gen-eui/metal"]
+vulkan = ["a2ui-gen-eui/vulkan"]
+openmp = ["a2ui-gen-eui/openmp"]
+
+[dependencies]
+a2ui-gen-eui = { path = "../a2ui-gen-eui", default-features = false }
+serde_json = { version = "1", features = ["preserve_order"] }
+tiny_http = { version = "0.12", default-features = false, optional = true }
+
+[[bin]]
+name = "a2ui-gen-eui-mcp"
+path = "src/main.rs"
+required-features = ["llama"]
+
+[lib]
+name = "a2ui_gen_eui_mcp"
+path = "src/lib.rs"

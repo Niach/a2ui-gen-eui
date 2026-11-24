@@ -2,3 +2,6 @@ a2ui-gen-eui
 Copyright 2026 The a2ui-gen-eui Authors
 
 Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This repository contains the catalog schema of @exponential_app/eui (Apache-2.0),
+vendored unmodified under crates/a2ui-gen-eui/vendor/eui/ with its own LICENSE and NOTICE.

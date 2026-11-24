@@ -1,0 +1,50 @@
+[package]
+name = "a2ui-gen-eui"
+description = "Generates A2UI Express user interfaces with a small local model: llama.cpp, grammar-guided decoding, compiler validation, streaming"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+readme = "../../README.md"
+
+[features]
+default = ["llama"]
+# Inference with llama.cpp. Without it: prompts, grammar, streaming and validation only.
+llama = ["dep:llama-cpp-2", "dep:async-channel", "dep:futures-core"]
+# GPU back ends (macOS arm64 gets Metal without a feature).
+cuda = ["llama", "llama-cpp-2/cuda"]
+metal = ["llama", "llama-cpp-2/metal"]
+vulkan = ["llama", "llama-cpp-2/vulkan"]
+# OpenMP instead of ggml's own thread pool (adds a runtime library).
+openmp = ["llama", "llama-cpp-2/openmp"]
+# Explicit, hash-checked model download. Never used during inference.
+download = ["dep:ureq"]
+
+[dependencies]
+a2ui-express = "0.2.0"
+async-channel = { version = "2", optional = true }
+futures-core = { version = "0.3", optional = true }
+llama-cpp-2 = { version = "=0.1.161", default-features = false, features = ["llguidance"], optional = true }
+llguidance = { version = "1.7.5", default-features = false, features = ["lark", "ahash"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+thiserror = "2"
+toktrie = "1.7.5"
+ureq = { version = "3", default-features = false, features = ["rustls"], optional = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+llama-cpp-2 = { version = "=0.1.161", default-features = false, features = ["android-static-stdcxx"], optional = true }
+
+[[example]]
+name = "bench"
+required-features = ["llama"]
+
+[[example]]
+name = "generate"
+required-features = ["llama"]
+
+[dev-dependencies]
+toktrie = "1.7.5"
