@@ -568,25 +568,24 @@ impl<'m> Session<'m> {
             _ => None,
         };
         let mut reading = catalog.open_stream();
-        let mut emit =
-            |reading: &mut crate::stream::ReplyStream, text: &str, stats: &mut Stats| -> Result<()> {
-                for chunk in reading.push(text)? {
-                    let block = match chunk {
-                        Chunk::Messages(m) => ExpressBlock::Messages(m),
-                        Chunk::Statement(source) => {
-                            let kind = StatementKind::of(&source);
-                            if kind != StatementKind::Surface && stats.first_block_ms.is_none() {
-                                stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
-                            }
-                            ExpressBlock::Statement { kind, source }
+        let emit = |reading: &mut crate::stream::ReplyStream, text: &str, stats: &mut Stats| -> Result<()> {
+            for chunk in reading.push(text)? {
+                let block = match chunk {
+                    Chunk::Messages(m) => ExpressBlock::Messages(m),
+                    Chunk::Statement(source) => {
+                        let kind = StatementKind::of(&source);
+                        if kind != StatementKind::Surface && stats.first_block_ms.is_none() {
+                            stats.first_block_ms = Some(started.elapsed().as_secs_f64() * 1e3);
                         }
-                    };
-                    if tx.send_blocking(Ok(block)).is_err() {
-                        return Err(Error::Cancelled);
+                        ExpressBlock::Statement { kind, source }
                     }
+                };
+                if tx.send_blocking(Ok(block)).is_err() {
+                    return Err(Error::Cancelled);
                 }
-                Ok(())
-            };
+            }
+            Ok(())
+        };
 
         // The grammar leaves no choice in how a reply starts, so it is read along with the prompt.
         let mut pending = vec![last];

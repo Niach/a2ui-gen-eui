@@ -17,35 +17,35 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
-      - run: cargo test --locked --workspace
-      - run: cargo build --locked --release -p a2ui-gen-eui-mcp
+      - uses: actions/checkout@v5
+      - run: bash scripts/ci-annotate.sh cargo test --locked --workspace
+      - run: bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui-mcp
   ios:
     runs-on: macos-14
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: rustup target add aarch64-apple-ios
-      - run: cargo build --locked --release -p a2ui-gen-eui --target aarch64-apple-ios --features metal
+      - run: bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui --target aarch64-apple-ios --features metal
         env:
           IPHONEOS_DEPLOYMENT_TARGET: "16.4"
   android:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: rustup target add aarch64-linux-android
       - run: |
           export ANDROID_NDK="$ANDROID_NDK_LATEST_HOME"
           export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang"
           export CC_aarch64_linux_android="$CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER"
-          cargo build --locked --release -p a2ui-gen-eui --target aarch64-linux-android
+          bash scripts/ci-annotate.sh cargo build --locked --release -p a2ui-gen-eui --target aarch64-linux-android
         env:
           ANDROID_API_LEVEL: "28"
   vulkan:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt-get update && sudo apt-get install -y libvulkan-dev glslc spirv-headers
-      - run: cargo check --locked --workspace --features a2ui-gen-eui/vulkan
+      - run: bash scripts/ci-annotate.sh cargo check --locked --workspace --features a2ui-gen-eui/vulkan
