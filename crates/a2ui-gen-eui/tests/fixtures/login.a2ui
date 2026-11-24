@@ -1,0 +1,12 @@
+<a2ui>
+surface("main")
+root = Page(title="Sign in", children=[card])
+card = Card(title="Welcome back", children=[form])
+form = Form(name="login", children=[email, password, actions], on={submit: Event("sign_in", {email: $/form/email, password: $/form/password})})
+email = Input(label="Email", name="email", type="email", value=$/form/email, checks=[?required, ?email])
+password = Input(label="Password", name="password", type="password", value=$/form/password, checks=[?length(8, "Too short")])
+actions = FormActions(submit="Sign in", children=[forgot])
+forgot = Button(label="Forgot password?", variant="link", on={press: Event("forgot_password")})
+$/form/email = ""
+$/form/password = ""
+</a2ui>

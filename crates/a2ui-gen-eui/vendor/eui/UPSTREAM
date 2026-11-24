@@ -1,0 +1,4 @@
+package: @exponential_app/eui
+version: 0.21.0
+integrity: sha512-2ciWuIpSHefk+QhDGwy2O4zuc1uOTQ/rUqQ0i/yHU61+iumMIN+veQAO5wQXQmpIMoX4HmbPDSe21/D71Dlt8g==
+synced-by: scripts/sync-eui.sh 0.21.0

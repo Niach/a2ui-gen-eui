@@ -1,0 +1,13 @@
+<a2ui>
+surface("main")
+root = Page(title="Orders", children=[tiles, list])
+tiles = Grid(columns={base: 1, md: 2}, gap="md", children=[revenue, count])
+revenue = StatTile(label="Revenue", value=formatCurrency($/revenue, "EUR"), delta="+4 %")
+count = StatTile(label="Orders", value=formatNumber($/count))
+list = Card(title="Latest", children=[rows])
+rows = List(children=_template($/orders, order))
+order = Row(title=$title, subtitle=$customer, meta=formatDate($date, "MMM d"), icon="package")
+$/revenue = 1240.5
+$/count = 2
+$/orders = [{title: "#1001", customer: "Ada", date: "2026-03-14T00:00:00Z"}, {title: "#1002", customer: "Grace \"G\"", date: "2026-03-15T00:00:00Z"}]
+</a2ui>
