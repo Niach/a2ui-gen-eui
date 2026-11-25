@@ -10,10 +10,10 @@ from pathlib import Path
 
 OUT = Path(__file__).parent / "vendor"
 NPM = "https://registry.npmjs.org/"
-EUI = (NPM + "@exponential_app/eui/-/eui-0.21.0.tgz", "sha512",
-       "2ciWuIpSHefk+QhDGwy2O4zuc1uOTQ/rUqQ0i/yHU61+iumMIN+veQAO5wQXQmpIMoX4HmbPDSe21/D71Dlt8g==")
-ELEMENT = (NPM + "@exponential_app/eui-element/-/eui-element-0.21.0.tgz", "sha512",
-           "Zl5xirBDzJRWgPhToEEdLpM67jDR+iDZkjLEU0SGTPrjfHBqDlsS+sQIXllZwcFDu78ODlL5TcRxXEUUR2k8Yw==")
+EUI = (NPM + "@exponential_app/eui/-/eui-0.22.0.tgz", "sha512",
+       "TODO: dist.integrity of the published 0.22.0")
+ELEMENT = (NPM + "@exponential_app/eui-element/-/eui-element-0.22.0.tgz", "sha512",
+           "TODO: dist.integrity of the published 0.22.0")
 LUCIDE = (NPM + "lucide-static/-/lucide-static-0.544.0.tgz", "sha512",
           "2PkMTYcjQkIzYbd5u2g7UtRaNDP7dLQT107MmYBdvnZZCO3Vj0nqH6HA5AkUS2Era8D1ITb/UxrOkfdH/qN2Ag==")
 # the catalog's semantic icon names (nav-home, ui-add, …) -> lucide

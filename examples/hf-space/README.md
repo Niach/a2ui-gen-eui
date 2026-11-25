@@ -32,11 +32,7 @@ JSON reply delivers everything at once**: the first block then takes as long as 
 so. `a2ui-gen-eui-mcp --http` is such a server today. "First block" is the first rendered message; data lines
 before `root` draw nothing.
 
-## eui 0.21.0 and checks
-
-`a2ui-express` writes A2UI v1.0's `@checks`; eui 0.21.0's runtime drops a component with that key and reads
-`checks`. `for_eui` in `app.py` renames it in every message, until eui reads `@checks`. Anything the renderer still
-rejects is listed in the page once a screen is finished.
+Anything the renderer rejects is listed in the page once a screen is finished.
 
 ## Run
 

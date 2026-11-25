@@ -30,22 +30,12 @@ class ToolError(Exception):
     pass
 
 
-def for_eui(message: dict) -> dict:
-    """The compiler writes A2UI v1.0's `@checks`; the runtime of eui 0.21.0 rejects a component with that key and
-    reads `checks`. Remove this when the pinned eui (vendor.py) reads `@checks`."""
-    for kind in ("createSurface", "updateComponents"):
-        for component in message.get(kind, {}).get("components") or []:
-            if "@checks" in component:
-                component["checks"] = component.pop("@checks")
-    return message
-
-
 def messages_of(parts: list[dict]) -> list[dict]:
     out = []
     for part in parts:
         if part.get("error"):
             raise ToolError(str(part["error"]))
-        out += [for_eui(m) for m in part.get("a2ui") or []]
+        out += part.get("a2ui") or []
     return out
 
 

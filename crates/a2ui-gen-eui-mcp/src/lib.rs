@@ -177,7 +177,7 @@ fn initialize(params: &Value) -> Value {
 }
 
 fn tools() -> Value {
-    let catalog = json!({"type": "object", "description": "An A2UI v1.0 catalog schema to use instead of the eui core catalog. The model knows eui's catalog best."});
+    let catalog = json!({"type": "object", "description": "An A2UI 1.0 catalog schema (`protocolVersion` 1.0) to use instead of the eui core catalog. The model knows eui's catalog best."});
     let output = json!({"type": "object", "properties": {
         "express": {"type": "string", "description": "The validated <a2ui>…</a2ui> block"},
         "attempts": {"type": "integer"},

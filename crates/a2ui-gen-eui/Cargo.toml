@@ -23,7 +23,7 @@ openmp = ["llama", "llama-cpp-2/openmp"]
 download = ["dep:ureq"]
 
 [dependencies]
-a2ui-express = "0.2.0"
+a2ui-express = "0.3.0"
 async-channel = { version = "2", optional = true }
 futures-core = { version = "0.3", optional = true }
 llama-cpp-2 = { version = "=0.1.161", default-features = false, features = ["llguidance"], optional = true }
