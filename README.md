@@ -157,7 +157,7 @@ an MCP server and renders the screens as they arrive.
 ```sh
 cargo test --workspace --no-default-features   # no native build, no model
 cargo test --workspace
-scripts/sync-eui.sh 0.21.0                     # re-vendor the catalog
+scripts/sync-eui.sh 0.22.0                     # re-vendor the catalog
 ```
 
 ## Licence

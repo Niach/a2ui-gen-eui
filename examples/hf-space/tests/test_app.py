@@ -83,14 +83,14 @@ def test_tool_error(stream):
 
 
 @pytest.mark.parametrize("stream", [True, False])
-def test_checks_are_named_for_eui(stream):
+def test_checks_keep_their_envelope_key(stream):
     with demo({"stream": stream, "attempts": [FORM]}) as c:
         ev = generate(c)
     messages = [m for e in ev if e["type"] == "messages" for m in e["messages"]]
     parts = {p["id"]: p for m in messages for k in ("createSurface", "updateComponents")
              for p in m.get(k, {}).get("components", [])}
-    assert len(parts["nameField"]["checks"]) == 1 and len(parts["emailField"]["checks"]) == 2
-    assert "@checks" not in json.dumps(messages)
+    assert len(parts["nameField"]["@checks"]) == 1 and len(parts["emailField"]["@checks"]) == 2
+    assert '"checks"' not in json.dumps(messages)
 
 
 def test_server_down():
