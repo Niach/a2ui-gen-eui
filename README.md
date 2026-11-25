@@ -93,6 +93,9 @@ renders; these models write their data lines before it. The same CPU decodes the
 without and 33.7 with grammar under heavier load (12 to 20). The first request of a catalog also compiles its
 grammar, once (0.35 s). `cargo run --release -p a2ui-gen-eui --example bench -- MODEL.gguf 8` repeats this.
 
+Validity, 0.8B Q4_K_M on 161 held-out requests: 127 valid at the first attempt, **156 (96.9 %)** with up to two
+retries; 18 s per screen on average at load 8 to 17.
+
 The grammar does not teach a model Express: base Qwen3.5 0.8B stays inside it but repeats itself until the
 attempt is ended (the same statement three times, or the token limit), so it gives no finished screen. Use a
 fine-tuned model.
