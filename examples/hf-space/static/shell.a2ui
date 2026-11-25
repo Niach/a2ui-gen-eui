@@ -1,4 +1,5 @@
 <a2ui>
+surface("shell")
 $/request = "A sign-up form for a newsletter with name, email and topics"
 $/data = ""
 $/change = ""
