@@ -147,6 +147,11 @@ a2ui-gen-eui-mcp --model model.gguf --http 127.0.0.1:8765     # streamable HTTP 
 - HTTP answers each POST with one JSON reply. It binds to loopback only and refuses foreign `Origin` and `Host`
   headers; it has no authentication.
 
+## Demo
+
+[`examples/hf-space`](examples/hf-space): a web page in the Hugging Face Space layout (Docker) that sends requests to
+an MCP server and renders the screens as they arrive.
+
 ## Development
 
 ```sh
