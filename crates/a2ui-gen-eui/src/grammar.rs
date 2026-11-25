@@ -301,12 +301,15 @@ impl<'a> Builder<'a> {
         for (p, s) in &props {
             match p.as_str() {
                 "component" => {}
-                "checks" => checkable = true,
+                // the check rules' envelope key, written inline; Express spells it `checks=`
+                "@checks" => checkable = true,
+                p if p.starts_with('@') => {}
                 "style" => alts.push("\"style=\" anymap".into()),
                 _ => alts.push(format!("{} {}", lit(&format!("{p}=")), self.conv(s))),
             }
         }
-        if checkable {
+        // a `checks` property of the component's own is an ordinary one, with the schema it declares
+        if checkable && !props.contains_key("checks") {
             alts.push("\"checks=\" checks".into());
         }
         if alts.is_empty() {

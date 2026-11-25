@@ -102,3 +102,24 @@ fn rejects_what_pruning_cannot_fix() {
             .is_err()
     );
 }
+
+#[test]
+fn messages_are_a2ui_1_0() {
+    let login = include_str!("fixtures/login.a2ui");
+    let messages = Catalog::eui().validate(login.trim()).unwrap();
+    assert!(messages.iter().all(|m| m["version"] == "1.0"));
+    let parts: Vec<_> = messages
+        .iter()
+        .flat_map(|m| ["createSurface", "updateComponents"].map(|k| &m[k]["components"]))
+        .filter_map(|c| c.as_array())
+        .flatten()
+        .collect();
+    let email = parts.iter().find(|c| c["id"] == "email").unwrap();
+    assert_eq!(email["@checks"].as_array().unwrap().len(), 2);
+    assert_eq!(email["value"]["@path"], "/form/email");
+    for c in parts {
+        for bare in ["checks", "catalogId", "metadata", "accessibility"] {
+            assert!(c.get(bare).is_none(), "{c}");
+        }
+    }
+}

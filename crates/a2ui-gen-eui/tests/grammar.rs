@@ -1,6 +1,6 @@
 use a2ui_gen_eui::constraint::{Constraint, ConstraintFactory, accepts};
 use a2ui_gen_eui::{Catalog, grammar};
-use serde_json::json;
+use serde_json::{Value, json};
 
 fn constraint(catalog: &Catalog) -> Constraint {
     let env = toktrie::ApproximateTokEnv::single_byte_env();
@@ -68,12 +68,12 @@ fn strings_in_all_four_forms() {
     }
 }
 
-#[test]
-fn follows_a_custom_catalog() {
-    let doc = json!({
+fn tiny() -> Value {
+    json!({
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://example.com/catalogs/tiny.json",
         "catalogId": "https://example.com/catalogs/tiny.json",
+        "protocolVersion": "1.0",
         "components": {
             "Headline": {
                 "type": "object",
@@ -87,8 +87,12 @@ fn follows_a_custom_catalog() {
             }
         },
         "functions": {}
-    });
-    let catalog = Catalog::from_json(doc).unwrap();
+    })
+}
+
+#[test]
+fn follows_a_custom_catalog() {
+    let catalog = Catalog::from_json(tiny()).unwrap();
     assert!(catalog.system_prompt().contains("Headline"));
     assert!(
         catalog
@@ -101,6 +105,36 @@ fn follows_a_custom_catalog() {
     catalog.validate(ok).unwrap();
     assert!(accepts(&g, &ok.replace("Headline", "Text")).is_err());
     assert!(catalog.validate(&ok.replace("words=\"hi\", ", "")).is_err());
+}
+
+#[test]
+fn refuses_catalogs_that_are_not_1_0() {
+    let refused = |version: Option<&str>| {
+        let mut doc = tiny();
+        match version {
+            Some(v) => doc["protocolVersion"] = v.into(),
+            None => _ = doc.as_object_mut().unwrap().remove("protocolVersion"),
+        }
+        Catalog::from_json(doc).is_err()
+    };
+    assert!(!refused(Some("1.0")));
+    for version in [None, Some("0.8"), Some("0.9"), Some("0.9.1")] {
+        assert!(refused(version), "{version:?}");
+    }
+}
+
+#[test]
+fn a_checks_property_of_the_components_own_is_an_ordinary_one() {
+    let mut doc = tiny();
+    doc["components"]["Headline"]["properties"]["checks"] = json!({"type": "number"});
+    let catalog = Catalog::from_json(doc).unwrap();
+    let g = constraint(&catalog);
+    let reply =
+        |value| format!("<a2ui>\nsurface(\"main\")\nroot = Headline(words=\"hi\", checks={value})\n</a2ui>");
+    accepts(&g, &reply("3")).unwrap();
+    let messages = catalog.validate(&reply("3")).unwrap();
+    assert_eq!(messages[0]["createSurface"]["components"][0]["checks"], 3);
+    assert!(accepts(&g, &reply("[?required]")).is_err());
 }
 
 #[test]

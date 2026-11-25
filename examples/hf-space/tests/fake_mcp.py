@@ -11,7 +11,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 SCREEN = ['surface("main")', '$/name = "Ada"', "root = Page(title=\"Profile\", children=[card])",
           'card = Card(title="Person", children=[name])', "name = Text(text=$/name)"]
 FORM = ['surface("main")', '$/form = {name: "", email: ""}', 'root = Page(title="Sign up", children=[form])',
-        'form = Form(name="f", children=[nameField, emailField, send])',
+        'form = Form(name="f", children=[nameField, emailField, send], on={submit: Event("subscribe")})',
         'nameField = Input(label="Name", name="name", value=$/form/name, checks=[?required("Required")])',
         'emailField = Input(label="Email", name="email", type="email", value=$/form/email, checks=[?required, ?email])',
         'send = FormActions(submit="Subscribe")']

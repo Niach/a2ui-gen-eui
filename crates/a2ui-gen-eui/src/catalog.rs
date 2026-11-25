@@ -46,7 +46,7 @@ impl Catalog {
             .clone()
     }
 
-    /// Any A2UI v1.0 catalog schema. Its signatures go into the system prompt.
+    /// Any A2UI 1.0 catalog schema; one that does not declare `protocolVersion` 1.0 is refused. Its signatures go into the system prompt.
     ///
     /// The default models know eui's catalog well and no other: the grammar and the compiler still keep
     /// their replies valid, but how well they use another catalog is not something they were trained for.
