@@ -54,7 +54,7 @@ let ui = generator.refine(&ui.express, "Add a notes field", None)?.wait()?;
 `Generator` run one after the other. The defaults (temperature 0.2, top-p 0.8, 4096 tokens, 2 retries at 0.7)
 are the ones the models were tuned for; `generate_with` / `refine_with` change them.
 
-**Custom catalogs.** `Catalog::from_json(schema)` takes any A2UI v1.0 catalog: grammar and validation follow it,
+**Custom catalogs.** `Catalog::from_json(schema)` takes any A2UI 1.0 catalog (`protocolVersion: "1.0"`, anything else is refused): grammar and validation follow it,
 and its signatures go into the system prompt. The default models know eui's catalog by heart and were not
 trained on others, so expect valid but less fitting screens.
 

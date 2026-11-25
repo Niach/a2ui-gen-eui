@@ -5,10 +5,8 @@ version = 4
 [[package]]
 name = "a2ui-express"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c11d6a6946b10222ff523ac0b751326a501813052f2f0da7f24d60ad0b07fd5"
+source = "git+https://github.com/Niach/a2ui-express-compiler-rust?rev=e97537e05088236ef987771a127011b24280e872#e97537e05088236ef987771a127011b24280e872"
 dependencies = [
- "serde",
  "serde_json",
  "thiserror",
 ]

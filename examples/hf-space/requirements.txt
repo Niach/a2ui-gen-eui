@@ -1,4 +1,4 @@
 fastapi==0.165.0
 uvicorn==0.54.0
 httpx==0.28.1
-a2ui-express @ git+https://github.com/Niach/a2ui-express-compiler-rust@0463a4f6d086a56dc42c19d04778d2e2544a7474#subdirectory=crates/a2ui-express-py
+a2ui-express @ git+https://github.com/Niach/a2ui-express-compiler-rust@e97537e05088236ef987771a127011b24280e872#subdirectory=crates/a2ui-express-py
