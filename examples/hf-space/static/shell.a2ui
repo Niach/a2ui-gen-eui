@@ -1,0 +1,35 @@
+<a2ui>
+surface("shell")
+$/request = "A sign-up form for a newsletter with name, email and topics"
+$/data = ""
+$/change = ""
+$/error = ""
+$/status = ""
+$/note = ""
+$/first = "-"
+$/total = "-"
+$/source = ""
+$/showSource = false
+$/busy = false
+$/has = false
+root = Page(title="a2ui-gen-eui", children=[body])
+body = Stack(gap="lg", children=[ask, alert, times, refine, source])
+ask = Stack(gap="md", children=[request, dataBox, generate])
+request = Textarea(label="Request", name="request", rows=4, value=$/request)
+dataBox = Collapsible(title="JSON data", open=false, children=[data])
+data = Textarea(label="Data the screen shows (JSON, optional)", name="data", rows=6, variant="code", value=$/data)
+generate = Button(label="Generate", disabled=$/busy, on={press: Event("generate", {request: $/request, data: $/data})})
+alert = Alert(title="Problem", message=$/error, type="error", visible=not(eq($/error, "")))
+times = Stack(gap="sm", children=[tiles, status, note])
+tiles = Grid(columns={base: 2}, children=[first, total])
+first = StatTile(label="First block", value=$/first)
+total = StatTile(label="Total", value=$/total)
+status = Text(text=$/status, variant="caption", live="polite", visible=not(eq($/status, "")))
+note = Text(text=$/note, variant="caption", visible=not(eq($/note, "")))
+refine = Stack(gap="md", visible=$/has, children=[change, refineButton])
+change = Textarea(label="Change", name="change", rows=2, placeholder="Add a notes field", value=$/change)
+refineButton = Button(label="Refine", variant="outline", disabled=$/busy, on={press: Event("refine", {change: $/change})})
+source = Stack(gap="md", visible=$/has, children=[sourceSwitch, code])
+sourceSwitch = Switch(label="View source", name="showSource", checked=$/showSource)
+code = CodeBlock(code=$/source, title="A2UI Express", wrap=true, copyable=true, visible=$/showSource)
+</a2ui>
