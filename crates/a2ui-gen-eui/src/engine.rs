@@ -4,8 +4,9 @@ use std::collections::HashMap;
 use std::num::NonZeroU32;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
-use std::sync::OnceLock;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc;
+use std::sync::{Arc, OnceLock};
 use std::task::{Context, Poll};
 use std::time::Instant;
 
@@ -193,9 +194,12 @@ struct Job {
     tx: Tx,
 }
 
-/// A loaded model. Generations run one at a time, in order.
+/// A loaded model. Generations run one at a time, in order; dropping it cancels those still running.
 pub struct Generator {
-    jobs: mpsc::Sender<Job>,
+    /// `None` only while it is dropped.
+    jobs: Option<mpsc::Sender<Job>>,
+    worker: Option<std::thread::JoinHandle<()>>,
+    stop: Arc<AtomicBool>,
     description: String,
 }
 
@@ -213,13 +217,22 @@ impl Generator {
         }
         let (jobs, queue) = mpsc::channel();
         let (ready_tx, ready_rx) = mpsc::channel();
-        std::thread::Builder::new()
-            .name("a2ui-gen-eui".into())
-            .spawn(move || worker(path, options, queue, ready_tx))?;
+        let stop = Arc::new(AtomicBool::new(false));
+        let worker = {
+            let stop = stop.clone();
+            std::thread::Builder::new()
+                .name("a2ui-gen-eui".into())
+                .spawn(move || worker(path, options, queue, ready_tx, stop))?
+        };
         let description = ready_rx
             .recv()
             .map_err(|_| Error::Model("the worker died while loading".into()))??;
-        Ok(Generator { jobs, description })
+        Ok(Generator {
+            jobs: Some(jobs),
+            worker: Some(worker),
+            stop,
+            description,
+        })
     }
 
     /// The model's name and size.
@@ -267,6 +280,8 @@ impl Generator {
     fn start(&self, user: String, catalog: Option<&Catalog>, options: Options) -> Result<Generation> {
         let (tx, rx) = async_channel::unbounded();
         self.jobs
+            .as_ref()
+            .expect("set until drop")
             .send(Job {
                 catalog: catalog.cloned().unwrap_or_else(Catalog::eui),
                 // Like the chat template.
@@ -276,6 +291,17 @@ impl Generator {
             })
             .map_err(|_| Error::Inference("the worker is gone".into()))?;
         Ok(Generation { rx: Box::pin(rx) })
+    }
+}
+
+/// Waits for the worker: a process that exits while llama.cpp computes would crash.
+impl Drop for Generator {
+    fn drop(&mut self) {
+        self.stop.store(true, Ordering::Relaxed);
+        self.jobs.take();
+        if let Some(worker) = self.worker.take() {
+            let _ = worker.join();
+        }
     }
 }
 
@@ -298,6 +324,7 @@ fn worker(
     options: LoadOptions,
     queue: mpsc::Receiver<Job>,
     ready: mpsc::Sender<Result<String>>,
+    stop: Arc<AtomicBool>,
 ) {
     let model = match load_model(&path, &options) {
         Ok(m) => m,
@@ -306,7 +333,7 @@ fn worker(
             return;
         }
     };
-    let mut session = match Session::new(&model, &options) {
+    let mut session = match Session::new(&model, &options, stop) {
         Ok(s) => s,
         Err(e) => {
             let _ = ready.send(Err(e));
@@ -320,7 +347,7 @@ fn worker(
         model.size() >> 20
     )));
     for job in queue {
-        if job.tx.is_closed() {
+        if job.tx.is_closed() || session.stop.load(Ordering::Relaxed) {
             continue;
         }
         let tx = job.tx.clone();
@@ -354,10 +381,11 @@ struct Session<'m> {
     grammars: Vec<Grammar>,
     /// State after the last system prompt, so the next request with the same catalog starts there.
     system: Option<(Vec<LlamaToken>, SeqState)>,
+    stop: Arc<AtomicBool>,
 }
 
 impl<'m> Session<'m> {
-    fn new(model: &'m LlamaModel, options: &LoadOptions) -> Result<Self> {
+    fn new(model: &'m LlamaModel, options: &LoadOptions, stop: Arc<AtomicBool>) -> Result<Self> {
         let threads = options.threads.unwrap_or_else(|| {
             let n = std::thread::available_parallelism().map_or(4, |n| n.get());
             (n / 2).clamp(1, 8)
@@ -379,6 +407,7 @@ impl<'m> Session<'m> {
             constraints: ConstraintFactory::new(&tok_env)?,
             grammars: Vec::new(),
             system: None,
+            stop,
         })
     }
 
@@ -394,7 +423,7 @@ impl<'m> Session<'m> {
     fn decode(&mut self, tokens: &[LlamaToken], pos: &mut usize, tx: &Tx) -> Result<()> {
         let mut batch = LlamaBatch::new(BATCH, 1);
         for chunk in tokens.chunks(BATCH) {
-            if tx.is_closed() {
+            if tx.is_closed() || self.stop.load(Ordering::Relaxed) {
                 return Err(Error::Cancelled);
             }
             batch.clear();
@@ -621,9 +650,6 @@ impl<'m> Session<'m> {
         let mut bytes: Vec<u8> = Vec::new();
         let mut done = false;
         for _ in 0..options.max_tokens {
-            if tx.is_closed() {
-                return Err(Error::Cancelled);
-            }
             self.decode(&pending, &mut pos, tx)?;
             let sampling = Instant::now();
             let logits = self.ctx.get_logits_ith(-1);
