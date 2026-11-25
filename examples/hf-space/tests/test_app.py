@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 sys.path[:0] = [str(Path(__file__).parents[1]), str(Path(__file__).parent)]
 from app import create_app, local_host  # noqa: E402
-from fake_mcp import BAD, SCREEN, express, make  # noqa: E402
+from fake_mcp import BAD, FORM, SCREEN, express, make  # noqa: E402
 
 
 @contextmanager
@@ -80,6 +80,17 @@ def test_json_reply():
 def test_tool_error(stream):
     with demo({"stream": stream}) as c:
         assert generate(c, "a game")[-1] == {"type": "error", "message": "unavailable: a game is running"}
+
+
+@pytest.mark.parametrize("stream", [True, False])
+def test_checks_are_named_for_eui(stream):
+    with demo({"stream": stream, "attempts": [FORM]}) as c:
+        ev = generate(c)
+    messages = [m for e in ev if e["type"] == "messages" for m in e["messages"]]
+    parts = {p["id"]: p for m in messages for k in ("createSurface", "updateComponents")
+             for p in m.get(k, {}).get("components", [])}
+    assert len(parts["nameField"]["checks"]) == 1 and len(parts["emailField"]["checks"]) == 2
+    assert "@checks" not in json.dumps(messages)
 
 
 def test_server_down():

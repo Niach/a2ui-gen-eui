@@ -45,6 +45,14 @@ async function* events(url, body) {
   }
 }
 
+// what the renderer rejected, as one line
+function problems(el) {
+  const issues = (el?.issues ?? []).map((i) => `#${i.id}: ${i.message}`)
+  if (!issues.length) return ""
+  const more = issues.length > 3 ? ` (and ${issues.length - 3} more)` : ""
+  return `The renderer rejected part of this screen: ${issues.slice(0, 3).join("; ")}${more}`
+}
+
 async function run(url, body) {
   if (busy) return
   busy = true
@@ -87,6 +95,7 @@ async function run(url, body) {
         const facts = [event.attempts && `${event.attempts} attempt${event.attempts > 1 ? "s" : ""}`, event.tokens && `${event.tokens} tokens`]
         show({
           total: since(), source: express, has: true, status: facts.filter(Boolean).join(", "),
+          error: problems(el),
           note: event.streamed ? "" : "This server does not stream: the screen arrived in one piece, so the first block is the whole reply.",
         })
       }

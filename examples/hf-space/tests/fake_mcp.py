@@ -1,6 +1,6 @@
 """A tiny MCP server: an event stream (one statement per event) or one JSON reply.
 
-    python tests/fake_mcp.py 8765 [json]
+    python tests/fake_mcp.py 8765 [json] [form] [broken]
 """
 
 import json
@@ -10,6 +10,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SCREEN = ['surface("main")', '$/name = "Ada"', "root = Page(title=\"Profile\", children=[card])",
           'card = Card(title="Person", children=[name])', "name = Text(text=$/name)"]
+FORM = ['surface("main")', '$/form = {name: "", email: ""}', 'root = Page(title="Sign up", children=[form])',
+        'form = Form(name="f", children=[nameField, emailField, send])',
+        'nameField = Input(label="Name", name="name", value=$/form/name, checks=[?required("Required")])',
+        'emailField = Input(label="Email", name="email", type="email", value=$/form/email, checks=[?required, ?email])',
+        'send = FormActions(submit="Subscribe")']
+# the renderer rejects it: `gone` is never defined
+BROKEN = ['surface("main")', 'root = Page(title="Broken", children=[a, gone])', 'a = Text(text="here")']
 BAD = ['surface("main")', '$/name = "old"', 'root = Page(title="Old", children=[x])', "x = Nope(a=1)"]
 
 
@@ -72,5 +79,6 @@ def make(stream: bool = True, delay: float = 0, attempts: list[list[str]] | None
 
 
 if __name__ == "__main__":
+    SCREENS = [FORM] if "form" in sys.argv else [BROKEN] if "broken" in sys.argv else [BAD, SCREEN]
     ThreadingHTTPServer(("127.0.0.1", int(sys.argv[1])),
-                        make(stream="json" not in sys.argv, delay=0.5, attempts=[BAD, SCREEN])).serve_forever()
+                        make(stream="json" not in sys.argv, delay=0.5, attempts=SCREENS)).serve_forever()
