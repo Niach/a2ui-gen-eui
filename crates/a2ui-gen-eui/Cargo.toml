@@ -23,9 +23,8 @@ openmp = ["llama", "llama-cpp-2/openmp"]
 download = ["dep:ureq"]
 
 [dependencies]
-# branch exp/session-f94d4796 (the at_exponential_express extension), not merged into main yet; 0.3.0 is
-# not on crates.io yet
-a2ui-express = { git = "https://github.com/Niach/a2ui-express-compiler-rust", rev = "40fa2f4aef81381b0378f814583f49c2b5910a73" }
+# main at a2ui-express #28 (the at_exponential_express extension); 0.3.0 is not on crates.io yet
+a2ui-express = { git = "https://github.com/Niach/a2ui-express-compiler-rust", rev = "92bddc0866a68e8b3903ac1278fbf434b1b73445" }
 async-channel = { version = "2", optional = true }
 futures-core = { version = "0.3", optional = true }
 llama-cpp-2 = { version = "=0.1.161", default-features = false, features = ["llguidance"], optional = true }
