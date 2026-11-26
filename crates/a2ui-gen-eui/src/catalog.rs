@@ -104,6 +104,17 @@ impl Catalog {
         grammar::gbnf(&self.inner.document)
     }
 
+    /// The grammar of a patch for llguidance, when the catalog declares the `at_exponential_express`
+    /// extension ([`grammar::lark_patch`]).
+    pub fn lark_patch(&self) -> Option<String> {
+        grammar::lark_patch(&self.inner.document)
+    }
+
+    /// The grammar of a patch for llama.cpp ([`grammar::gbnf_patch`]).
+    pub fn gbnf_patch(&self) -> Option<String> {
+        grammar::gbnf_patch(&self.inner.document)
+    }
+
     #[cfg(feature = "llama")]
     pub(crate) fn key(&self) -> usize {
         Arc::as_ptr(&self.inner) as usize

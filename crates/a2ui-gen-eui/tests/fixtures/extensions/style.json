@@ -1,0 +1,439 @@
+{
+  "description": "style(name, \"words\") classes and s= on any component: the shorthand over eUI's Box style whitelist, expanded into the plain style map.",
+  "catalog": "catalog.json",
+  "cases": [
+    {
+      "name": "style_inline_words",
+      "action": "compile",
+      "input": "root = Column([a], s=\"col g12 p16 bg-card r-lg sh-sm\")\na = Text(\"x\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "a"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 12,
+                  "padding": 16,
+                  "backgroundColor": "$color.card",
+                  "borderRadius": "$radius.lg",
+                  "boxShadow": "$shadow.sm"
+                }
+              },
+              {
+                "id": "a",
+                "component": "Text",
+                "text": "x"
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Column([a], s=\"col g12 p16 bg-card r-lg sh-sm\")\na = Text(\"x\")"
+    },
+    {
+      "name": "style_class",
+      "action": "compile",
+      "input": "style(card, \"col g12 p16 bg-card r-lg sh-sm\")\nroot = Column([a, b], s=\"col g16\")\na = Card(t, s=card)\nb = Card(u, s=card)\nt = Text(\"A\")\nu = Text(\"B\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "a",
+                  "b"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 16
+                }
+              },
+              {
+                "id": "a",
+                "component": "Card",
+                "child": "t",
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 12,
+                  "padding": 16,
+                  "backgroundColor": "$color.card",
+                  "borderRadius": "$radius.lg",
+                  "boxShadow": "$shadow.sm"
+                }
+              },
+              {
+                "id": "b",
+                "component": "Card",
+                "child": "u",
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 12,
+                  "padding": 16,
+                  "backgroundColor": "$color.card",
+                  "borderRadius": "$radius.lg",
+                  "boxShadow": "$shadow.sm"
+                }
+              },
+              {
+                "id": "t",
+                "component": "Text",
+                "text": "A"
+              },
+              {
+                "id": "u",
+                "component": "Text",
+                "text": "B"
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nstyle(k1, \"col g12 p16 bg-card r-lg sh-sm\")\nroot = Column([a, b], s=\"col g16\")\na = Card(t, s=k1)\nb = Card(u, s=k1)\nt = Text(\"A\")\nu = Text(\"B\")"
+    },
+    {
+      "name": "style_class_composed_in_words",
+      "action": "compile",
+      "input": "style(card, \"p16 bg-card r-lg\")\nroot = Card(t, s=\"card sh-md hover:bg-accent\")\nt = Text(\"x\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Card",
+                "child": "t",
+                "style": {
+                  "padding": 16,
+                  "backgroundColor": "$color.card",
+                  "borderRadius": "$radius.lg",
+                  "boxShadow": "$shadow.md",
+                  ":hover": {
+                    "backgroundColor": "$color.accent"
+                  }
+                }
+              },
+              {
+                "id": "t",
+                "component": "Text",
+                "text": "x"
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Card(t, s=\"p16 bg-card r-lg sh-md hover:bg-accent\")\nt = Text(\"x\")"
+    },
+    {
+      "name": "style_later_words_win",
+      "action": "compile",
+      "input": "root = Text(\"x\", s=\"p8 p16 fg-foreground fg-mutedForeground\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x",
+                "style": {
+                  "padding": 16,
+                  "color": "$color.mutedForeground"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Text(\"x\", s=\"p16 fg-mutedForeground\")"
+    },
+    {
+      "name": "style_units_tokens_negatives",
+      "action": "compile",
+      "input": "root = Text(\"x\", s=\"w50% maxw-auto h-control.input mt-8 p16px op0.5 fw600 fs-sm lh-sm items-center justify-between grow\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x",
+                "style": {
+                  "width": "50%",
+                  "maxWidth": "auto",
+                  "height": "$control.input",
+                  "marginTop": -8,
+                  "padding": "16px",
+                  "opacity": 0.5,
+                  "fontWeight": 600,
+                  "fontSize": "$type.size.sm",
+                  "lineHeight": "$type.lineHeight.sm",
+                  "alignItems": "center",
+                  "justifyContent": "space-between",
+                  "flexGrow": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Text(\"x\", s=\"justify-between items-center grow w50% h-control.input maxw-auto p16px mt-8 op0.5 fs-sm fw600 lh-sm\")"
+    },
+    {
+      "name": "style_states",
+      "action": "compile",
+      "input": "root = Button(\"Go\", s=\"bg-primary fg-primaryForeground hover:bg-accent pressed:op0.8 focus:bc-ring\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Button",
+                "label": "Go",
+                "style": {
+                  "backgroundColor": "$color.primary",
+                  "color": "$color.primaryForeground",
+                  ":hover": {
+                    "backgroundColor": "$color.accent"
+                  },
+                  ":pressed": {
+                    "opacity": 0.8
+                  },
+                  ":focus-visible": {
+                    "borderColor": "$color.ring"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Button(\"Go\", s=\"bg-primary fg-primaryForeground hover:bg-accent focus:bc-ring pressed:op0.8\")"
+    },
+    {
+      "name": "style_map_beside_words_wins",
+      "action": "compile",
+      "input": "root = Text(\"x\", s=\"p8 bg-card\", style={padding: 4, transform: \"scale(2)\"})",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x",
+                "style": {
+                  "backgroundColor": "$color.card",
+                  "padding": 4,
+                  "transform": "scale(2)"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Text(\"x\", _, {transform: \"scale(2)\"}, s=\"p4 bg-card\")"
+    },
+    {
+      "name": "style_shared_words_become_a_class",
+      "action": "compile",
+      "input": "root = Column([a, b, c])\na = Text(\"1\", s=\"p8 r-md bg-muted\")\nb = Text(\"2\", s=\"p8 r-md bg-muted\")\nc = Text(\"3\", s=\"p8 r-md bg-muted\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "a",
+                  "b",
+                  "c"
+                ]
+              },
+              {
+                "id": "a",
+                "component": "Text",
+                "text": "1",
+                "style": {
+                  "padding": 8,
+                  "borderRadius": "$radius.md",
+                  "backgroundColor": "$color.muted"
+                }
+              },
+              {
+                "id": "b",
+                "component": "Text",
+                "text": "2",
+                "style": {
+                  "padding": 8,
+                  "borderRadius": "$radius.md",
+                  "backgroundColor": "$color.muted"
+                }
+              },
+              {
+                "id": "c",
+                "component": "Text",
+                "text": "3",
+                "style": {
+                  "padding": 8,
+                  "borderRadius": "$radius.md",
+                  "backgroundColor": "$color.muted"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nstyle(k1, \"p8 bg-muted r-md\")\nroot = Column([a, b, c])\na = Text(\"1\", s=k1)\nb = Text(\"2\", s=k1)\nc = Text(\"3\", s=k1)"
+    },
+    {
+      "name": "style_unspellable_values_stay_a_map",
+      "action": "compile",
+      "input": "root = Text(\"x\", style={padding: 16, backgroundGradient: {angle: 90, stops: [{color: \"$color.primary\", offset: 0}]}, gridTemplateColumns: \"1fr 2fr\"})",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x",
+                "style": {
+                  "padding": 16,
+                  "backgroundGradient": {
+                    "angle": 90,
+                    "stops": [
+                      {
+                        "color": "$color.primary",
+                        "offset": 0
+                      }
+                    ]
+                  },
+                  "gridTemplateColumns": "1fr 2fr"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Text(\"x\", _, {backgroundGradient: {angle: 90, stops: [{color: \"$color.primary\", offset: 0}]}, gridTemplateColumns: \"1fr 2fr\"}, s=\"p16\")"
+    },
+    {
+      "name": "style_on_an_inline_child",
+      "action": "compile",
+      "input": "root = Column([Text(\"x\", s=\"p4\")], s=\"col\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "root_children_0"
+                ],
+                "style": {
+                  "flexDirection": "column"
+                }
+              },
+              {
+                "id": "root_children_0",
+                "component": "Text",
+                "text": "x",
+                "style": {
+                  "padding": 4
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Column([Text(\"x\", s=\"p4\")], s=\"col\")"
+    },
+    {
+      "name": "style_unknown_word",
+      "action": "compile",
+      "input": "root = Text(\"x\", s=\"padding16\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "not a style shorthand word"
+      }
+    },
+    {
+      "name": "style_bad_enum",
+      "action": "compile",
+      "input": "root = Text(\"x\", s=\"justify-middle\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "not a value of justifyContent"
+      }
+    },
+    {
+      "name": "style_undefined_class",
+      "action": "compile",
+      "input": "root = Text(\"x\", s=card)",
+      "expect_error": {
+        "category": "Validation",
+        "message": "names no style class"
+      }
+    },
+    {
+      "name": "style_class_named_like_a_word",
+      "action": "compile",
+      "input": "style(col, \"p8\")\nroot = Text(\"x\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "reads as a shorthand word"
+      }
+    },
+    {
+      "name": "style_map_not_literal_with_words",
+      "action": "compile",
+      "input": "m = {padding: 4}\nroot = Text(\"x\", s=\"p8\", style=m)",
+      "expect_error": {
+        "category": "Validation",
+        "message": "map literal"
+      }
+    }
+  ]
+}

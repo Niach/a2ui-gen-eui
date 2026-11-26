@@ -1,0 +1,744 @@
+{
+  "description": "Motion sugar: enter=, exit=, stagger=, delay= on any component (style.animation, exitAnimation, animationStagger, animationDelay); Motion(ref=\"name\") from the catalog's motions registry; Motion(kf=\"…\") keyframes into the eui-motion dialect.",
+  "catalog": "catalog.json",
+  "cases": [
+    {
+      "name": "motion_enter_exit_stagger_delay",
+      "action": "compile",
+      "input": "root = Column([a, b], stagger=60, s=\"col g8\")\na = Text(\"1\", enter=\"slide-in-up\", delay=120)\nb = Text(\"2\", enter=\"fade-in\", exit=\"fade-out\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "a",
+                  "b"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 8,
+                  "animationStagger": 60
+                }
+              },
+              {
+                "id": "a",
+                "component": "Text",
+                "text": "1",
+                "style": {
+                  "animation": "slide-in-up",
+                  "animationDelay": 120
+                }
+              },
+              {
+                "id": "b",
+                "component": "Text",
+                "text": "2",
+                "style": {
+                  "animation": "fade-in",
+                  "exitAnimation": "fade-out"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Column([a, b], s=\"col g8\", stagger=60)\na = Text(\"1\", enter=\"slide-in-up\", delay=120)\nb = Text(\"2\", enter=\"fade-in\", exit=\"fade-out\")"
+    },
+    {
+      "name": "motion_ref_from_the_registry",
+      "action": "compile",
+      "input": "root = Column([dot, spin])\ndot = Motion(ref=\"pulse-dot\")\nspin = Motion(ref=\"spinner\", label=\"Loading\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "dot",
+                  "spin"
+                ]
+              },
+              {
+                "id": "dot",
+                "component": "Motion",
+                "size": [
+                  24,
+                  24
+                ],
+                "duration": 1200,
+                "layers": [
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        12,
+                        12
+                      ],
+                      "position": [
+                        12,
+                        12
+                      ],
+                      "scale": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": [
+                              100,
+                              100
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": [
+                              140,
+                              140
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": [
+                              100,
+                              100
+                            ]
+                          }
+                        ]
+                      },
+                      "opacity": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": 100,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": 40,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": 100
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "ellipse",
+                        "position": [
+                          12,
+                          12
+                        ],
+                        "size": [
+                          12,
+                          12
+                        ]
+                      },
+                      {
+                        "type": "fill",
+                        "color": "$color.primary"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "spin",
+                "component": "Motion",
+                "label": "Loading",
+                "size": [
+                  24,
+                  24
+                ],
+                "duration": 900,
+                "layers": [
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        12,
+                        12
+                      ],
+                      "position": [
+                        12,
+                        12
+                      ],
+                      "rotation": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": 0
+                          },
+                          {
+                            "t": 900,
+                            "v": 360
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "ellipse",
+                        "position": [
+                          12,
+                          12
+                        ],
+                        "size": [
+                          18,
+                          18
+                        ]
+                      },
+                      {
+                        "type": "stroke",
+                        "color": "$color.primary",
+                        "width": 3
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Column([dot, spin])\ndot = Motion(ref=\"pulse-dot\")\nspin = Motion(label=\"Loading\", ref=\"spinner\")"
+    },
+    {
+      "name": "motion_ref_props_on_the_call_win",
+      "action": "compile",
+      "input": "root = Motion(ref=\"pulse-dot\", duration=2400)",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Motion",
+                "duration": 2400,
+                "size": [
+                  24,
+                  24
+                ],
+                "layers": [
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        12,
+                        12
+                      ],
+                      "position": [
+                        12,
+                        12
+                      ],
+                      "scale": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": [
+                              100,
+                              100
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": [
+                              140,
+                              140
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": [
+                              100,
+                              100
+                            ]
+                          }
+                        ]
+                      },
+                      "opacity": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": 100,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": 40,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": 100
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "ellipse",
+                        "position": [
+                          12,
+                          12
+                        ],
+                        "size": [
+                          12,
+                          12
+                        ]
+                      },
+                      {
+                        "type": "fill",
+                        "color": "$color.primary"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Motion(duration=2400, ref=\"pulse-dot\")"
+    },
+    {
+      "name": "motion_keyframes",
+      "action": "compile",
+      "input": "root = Motion(kf=\"circle 12 12 6 $color.primary | scale 0:100 600:140 1200:100 ease-in-out | opacity 0:100 600:40 1200:100 ease-in-out\", size=[24, 24], duration=1200)",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Motion",
+                "size": [
+                  24,
+                  24
+                ],
+                "duration": 1200,
+                "layers": [
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        12,
+                        12
+                      ],
+                      "position": [
+                        12,
+                        12
+                      ],
+                      "scale": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": [
+                              100,
+                              100
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": [
+                              140,
+                              140
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": [
+                              100,
+                              100
+                            ]
+                          }
+                        ]
+                      },
+                      "opacity": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": 100,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": 40,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": 100
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "ellipse",
+                        "position": [
+                          12,
+                          12
+                        ],
+                        "size": [
+                          12,
+                          12
+                        ]
+                      },
+                      {
+                        "type": "fill",
+                        "color": "$color.primary"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Motion(ref=\"pulse-dot\")"
+    },
+    {
+      "name": "motion_keyframes_two_layers",
+      "action": "compile",
+      "input": "root = Motion(kf=\"ring 20 20 16 3 #2563eb | rotate 0:0 1000:360; rect 20 20 8 8 2 $color.accent | move 0:0,0 500:0,-6 1000:0,0 ease\", size=[40, 40], duration=1000)",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Motion",
+                "size": [
+                  40,
+                  40
+                ],
+                "duration": 1000,
+                "layers": [
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        20,
+                        20
+                      ],
+                      "position": [
+                        20,
+                        20
+                      ],
+                      "rotation": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": 0
+                          },
+                          {
+                            "t": 1000,
+                            "v": 360
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "ellipse",
+                        "position": [
+                          20,
+                          20
+                        ],
+                        "size": [
+                          32,
+                          32
+                        ]
+                      },
+                      {
+                        "type": "stroke",
+                        "color": "#2563eb",
+                        "width": 3
+                      }
+                    ]
+                  },
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        20,
+                        20
+                      ],
+                      "position": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": [
+                              20,
+                              20
+                            ],
+                            "ease": "ease"
+                          },
+                          {
+                            "t": 500,
+                            "v": [
+                              20,
+                              14
+                            ],
+                            "ease": "ease"
+                          },
+                          {
+                            "t": 1000,
+                            "v": [
+                              20,
+                              20
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "rect",
+                        "position": [
+                          20,
+                          20
+                        ],
+                        "size": [
+                          8,
+                          8
+                        ],
+                        "radius": 2
+                      },
+                      {
+                        "type": "fill",
+                        "color": "$color.accent"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Motion(size=[40, 40], duration=1000, kf=\"ring 20 20 16 3 #2563eb | rotate 0:0 1000:360; rect 20 20 8 8 2 $color.accent | move 0:0,0 500:0,-6 1000:0,0 ease\")"
+    },
+    {
+      "name": "motion_keyframes_equal_to_a_ref_decompile_as_the_ref",
+      "action": "compile",
+      "input": "root = Motion(kf=\"circle 12 12 6 $color.primary | scale 0:100 600:140 1200:100 ease-in-out | opacity 0:100 600:40 1200:100 ease-in-out\", size=[24, 24], duration=1200)\n",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Motion",
+                "size": [
+                  24,
+                  24
+                ],
+                "duration": 1200,
+                "layers": [
+                  {
+                    "type": "shape",
+                    "transform": {
+                      "anchor": [
+                        12,
+                        12
+                      ],
+                      "position": [
+                        12,
+                        12
+                      ],
+                      "scale": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": [
+                              100,
+                              100
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": [
+                              140,
+                              140
+                            ],
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": [
+                              100,
+                              100
+                            ]
+                          }
+                        ]
+                      },
+                      "opacity": {
+                        "keys": [
+                          {
+                            "t": 0,
+                            "v": 100,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 600,
+                            "v": 40,
+                            "ease": "ease-in-out"
+                          },
+                          {
+                            "t": 1200,
+                            "v": 100
+                          }
+                        ]
+                      }
+                    },
+                    "shapes": [
+                      {
+                        "type": "ellipse",
+                        "position": [
+                          12,
+                          12
+                        ],
+                        "size": [
+                          12,
+                          12
+                        ]
+                      },
+                      {
+                        "type": "fill",
+                        "color": "$color.primary"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Motion(ref=\"pulse-dot\")"
+    },
+    {
+      "name": "motion_plain_layers_stay_layers",
+      "action": "compile",
+      "input": "root = Motion(layers=[{type: \"solid\", color: \"#ff0000\", size: [10, 10]}], size=[10, 10], duration=500)",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Motion",
+                "layers": [
+                  {
+                    "type": "solid",
+                    "color": "#ff0000",
+                    "size": [
+                      10,
+                      10
+                    ]
+                  }
+                ],
+                "size": [
+                  10,
+                  10
+                ],
+                "duration": 500
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Motion([{type: \"solid\", color: \"#ff0000\", size: [10, 10]}], [10, 10], 500)"
+    },
+    {
+      "name": "motion_unknown_enter",
+      "action": "compile",
+      "input": "root = Text(\"x\", enter=\"zoom\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "enter= is one of"
+      }
+    },
+    {
+      "name": "motion_unknown_exit",
+      "action": "compile",
+      "input": "root = Text(\"x\", exit=\"fade-in\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "exit= is one of"
+      }
+    },
+    {
+      "name": "motion_negative_stagger",
+      "action": "compile",
+      "input": "root = Column([], stagger=-1)",
+      "expect_error": {
+        "category": "Validation",
+        "message": "at least 0"
+      }
+    },
+    {
+      "name": "motion_unknown_ref",
+      "action": "compile",
+      "input": "root = Motion(ref=\"nope\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "not a registered animation"
+      }
+    },
+    {
+      "name": "motion_bad_keyframes",
+      "action": "compile",
+      "input": "root = Motion(kf=\"blob 1 2 3\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "not a shape"
+      }
+    },
+    {
+      "name": "motion_kf_and_layers",
+      "action": "compile",
+      "input": "root = Motion(kf=\"circle 1 1 1 #000000\", layers=[])",
+      "expect_error": {
+        "category": "Validation",
+        "message": "not both"
+      }
+    }
+  ]
+}

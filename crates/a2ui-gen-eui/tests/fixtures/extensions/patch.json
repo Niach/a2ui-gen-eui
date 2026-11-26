@@ -1,0 +1,387 @@
+{
+  "description": "compile_patch(screen, patch): reassignments, data paths, del() and theme() against an existing surface; only what changed is sent, and applying the messages equals compiling the new screen.",
+  "catalog": "catalog.json",
+  "cases": [
+    {
+      "name": "patch_reassign_one_component",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "title = Text(\"Today\", variant=\"title\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateComponents": {
+            "surfaceId": "main",
+            "components": [
+              {
+                "id": "title",
+                "component": "Text",
+                "text": "Today",
+                "variant": "title"
+              }
+            ]
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Today\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}"
+    },
+    {
+      "name": "patch_add_a_component",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "list = Column([a, b, c], s=card)\nc = Text(\"Celebrate\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateComponents": {
+            "surfaceId": "main",
+            "components": [
+              {
+                "id": "list",
+                "component": "Column",
+                "children": [
+                  "a",
+                  "b",
+                  "c"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 8,
+                  "padding": 16,
+                  "backgroundColor": "$color.card",
+                  "borderRadius": "$radius.lg"
+                }
+              },
+              {
+                "id": "c",
+                "component": "Text",
+                "text": "Celebrate"
+              }
+            ]
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b, c], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}\nc = Text(\"Celebrate\")"
+    },
+    {
+      "name": "patch_data_path",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "$/items = [\"Write\", \"Test\", \"Ship\"]",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateDataModel": {
+            "surfaceId": "main",
+            "path": "/items",
+            "value": [
+              "Write",
+              "Test",
+              "Ship"
+            ]
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Test\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}"
+    },
+    {
+      "name": "patch_nested_data_change_sends_only_the_leaf",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "$/user = {name: \"Ada\", role: \"owner\"}",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateDataModel": {
+            "surfaceId": "main",
+            "path": "/user/role",
+            "value": "owner"
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"owner\"}"
+    },
+    {
+      "name": "patch_del_a_component",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "del(b)",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateComponents": {
+            "surfaceId": "main",
+            "components": [
+              {
+                "id": "list",
+                "component": "Column",
+                "children": [
+                  "a"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 8,
+                  "padding": 16,
+                  "backgroundColor": "$color.card",
+                  "borderRadius": "$radius.lg"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a], s=card)\na = Text($/items/0)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}"
+    },
+    {
+      "name": "patch_del_a_data_path",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "del($/user)",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateDataModel": {
+            "surfaceId": "main",
+            "path": "/user",
+            "value": null
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]"
+    },
+    {
+      "name": "patch_theme_change",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "theme(primary=#16a34a, radius=0)",
+      "expect": [
+        {
+          "version": "1.0",
+          "callRendererFunction": {
+            "surfaceId": "main",
+            "functionCallId": "call_1",
+            "callFunction": {
+              "catalogId": "express/extensions",
+              "@call": "setTheme",
+              "args": {
+                "theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#16a34a",
+                        "primaryForeground": "#0a0a0a",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#16a34a",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#00872e"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#16a34a",
+                        "primaryForeground": "#0a0a0a",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#16a34a",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#16a34a"
+                      }
+                    }
+                  },
+                  "tokens": {
+                    "radius": {
+                      "sm": 0,
+                      "md": 0,
+                      "lg": 0,
+                      "xl": 0,
+                      "xl2": 0,
+                      "xl3": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#16a34a, radius=0)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}"
+    },
+    {
+      "name": "patch_class_change_resends_its_users",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "style(card, \"col g4 p8 bg-muted r-sm\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateComponents": {
+            "surfaceId": "main",
+            "components": [
+              {
+                "id": "list",
+                "component": "Column",
+                "children": [
+                  "a",
+                  "b"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "padding": 8,
+                  "backgroundColor": "$color.muted",
+                  "borderRadius": "$radius.sm"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g4 p8 bg-muted r-sm\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}"
+    },
+    {
+      "name": "patch_nothing_changes",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "title = Text(\"Tasks\", variant=\"title\")",
+      "expect": [],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}"
+    },
+    {
+      "name": "patch_several_at_once",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "title = Text(\"Done\", variant=\"title\", enter=\"fade-in\")\ndel(save)\n$/items/0 = \"Wrote\"",
+      "expect": [
+        {
+          "version": "1.0",
+          "updateComponents": {
+            "surfaceId": "main",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "title",
+                  "list"
+                ],
+                "style": {
+                  "flexDirection": "column",
+                  "gap": 16,
+                  "padding": 24
+                }
+              },
+              {
+                "id": "title",
+                "component": "Text",
+                "text": "Done",
+                "variant": "title",
+                "style": {
+                  "animation": "fade-in"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "version": "1.0",
+          "updateDataModel": {
+            "surfaceId": "main",
+            "path": "/items",
+            "value": [
+              "Wrote",
+              "Ship"
+            ]
+          }
+        }
+      ],
+      "screen_after": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list], s=\"col g16 p24\")\ntitle = Text(\"Done\", variant=\"title\", enter=\"fade-in\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}\n$/items/0 = \"Wrote\""
+    },
+    {
+      "name": "patch_del_unknown",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "del(zzz)",
+      "expect_error": {
+        "category": "Validation",
+        "message": "assigns no variable"
+      }
+    },
+    {
+      "name": "patch_del_named_outside_a_list",
+      "action": "patch",
+      "screen": "root = Card(t)\nt = Text(\"x\")",
+      "patch": "del(t)",
+      "expect_error": {
+        "message": "outside a child list"
+      }
+    },
+    {
+      "name": "patch_with_a_surface_line",
+      "action": "patch",
+      "screen": "theme(primary=#2563eb)\nstyle(card, \"col g8 p16 bg-card r-lg\")\nroot = Column([title, list, save], s=\"col g16 p24\")\ntitle = Text(\"Tasks\", variant=\"title\")\nlist = Column([a, b], s=card)\na = Text($/items/0)\nb = Text($/items/1)\nsave = Button(\"Save\", action=Event(\"save\"))\n$/items = [\"Write\", \"Ship\"]\n$/user = {name: \"Ada\", role: \"admin\"}",
+      "patch": "surface(\"other\")\nroot = Text(\"x\")",
+      "expect_error": {
+        "message": "leave out surface"
+      }
+    }
+  ]
+}

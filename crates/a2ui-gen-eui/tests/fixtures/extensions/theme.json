@@ -1,0 +1,1823 @@
+{
+  "description": "theme(...): seeds expanded into an eUI theme in createSurface.metadata.extensions.at_exponential_theme; on a surface that exists, a setTheme renderer call. expand_theme cases pin the expansion as golden JSON.",
+  "catalog": "catalog.json",
+  "cases": [
+    {
+      "name": "theme_seeds_go_into_create_surface",
+      "action": "compile",
+      "input": "theme(primary=#7c3aed)\nroot = Text(\"Hello\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#7c3aed",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#7c3aed",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#7c3aed"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#7c3aed",
+                        "primaryForeground": "#fafafa",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#7c3aed",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#9054ff"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(primary=#7c3aed)\nroot = Text(\"Hello\")"
+    },
+    {
+      "name": "theme_the_brief_example",
+      "action": "compile",
+      "input": "theme(base=\"dark\", primary=#eef800, bg=#0e0e0e, card=#161616, radius=0, font=\"Inter\", scale=1, density=\"compact\", shadow=\"none\", button=\"pill\")\nroot = Column([t])\nt = Text(\"Hi\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Column",
+                "children": [
+                  "t"
+                ]
+              },
+              {
+                "id": "t",
+                "component": "Text",
+                "text": "Hi"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#fcfcfc",
+                        "foreground": "#0a0a0a",
+                        "card": "#f2f2f2",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#f2f2f2",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#939900",
+                        "primaryForeground": "#0a0a0a",
+                        "secondary": "#ededed",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#ededed",
+                        "mutedForeground": "#6b6b6b",
+                        "accent": "#ededed",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#dfdfdf",
+                        "input": "#dfdfdf",
+                        "ring": "#939900",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c68300",
+                        "chart5": "#d87700",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#737700"
+                      },
+                      "shadow": {
+                        "none": [],
+                        "sm": [],
+                        "md": [],
+                        "lg": [],
+                        "xl": [],
+                        "popover": []
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0e0e0e",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#eef800",
+                        "primaryForeground": "#0e0e0e",
+                        "secondary": "#2a2a2a",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#2a2a2a",
+                        "mutedForeground": "#939393",
+                        "accent": "#2a2a2a",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0e0e0e",
+                        "success": "#22c55e",
+                        "successForeground": "#0e0e0e",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0e0e0e",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0e0e0e",
+                        "border": "#343434",
+                        "input": "#343434",
+                        "ring": "#eef800",
+                        "chart1": "#194eed",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#eef800"
+                      },
+                      "shadow": {
+                        "none": [],
+                        "sm": [],
+                        "md": [],
+                        "lg": [],
+                        "xl": [],
+                        "popover": []
+                      }
+                    }
+                  },
+                  "tokens": {
+                    "radius": {
+                      "sm": 0,
+                      "md": 0,
+                      "lg": 0,
+                      "xl": 0,
+                      "xl2": 0,
+                      "xl3": 0
+                    },
+                    "spacing": {
+                      "xxs": 2,
+                      "xs": 4,
+                      "sm": 7,
+                      "md": 11,
+                      "lg": 14,
+                      "xl": 21,
+                      "xl2": 28,
+                      "xl3": 42
+                    },
+                    "control": {
+                      "buttonSm": 28,
+                      "buttonMd": 32,
+                      "buttonLg": 35,
+                      "buttonIcon": 32,
+                      "input": 32,
+                      "row": 35,
+                      "rowCompact": 28,
+                      "pill": 21,
+                      "badge": 18,
+                      "chip": 25,
+                      "toggle": 32
+                    },
+                    "type": {
+                      "family": {
+                        "sans": "Inter"
+                      }
+                    }
+                  },
+                  "fonts": {
+                    "Inter": {
+                      "fallback": "ui-sans-serif, system-ui, sans-serif",
+                      "weights": [
+                        400,
+                        500,
+                        600,
+                        700
+                      ],
+                      "source": "host"
+                    }
+                  },
+                  "recipes": {
+                    "Button": {
+                      "root": [
+                        {
+                          "style": {
+                            "borderRadius": "$radius.full"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(base=\"dark\", bg=#0e0e0e, card=#161616, primary=#eef800, radius=0, font=\"Inter\", density=\"compact\", shadow=\"none\", button=\"pill\")\nroot = Column([t])\nt = Text(\"Hi\")"
+    },
+    {
+      "name": "theme_builtin_id",
+      "action": "compile",
+      "input": "theme(\"orange\")\nroot = Text(\"Hello\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": "orange"
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(\"orange\")\nroot = Text(\"Hello\")"
+    },
+    {
+      "name": "theme_with_overrides",
+      "action": "compile",
+      "input": "theme(primary=#0f766e, cardForeground=#111111, dark={ring: #ff00ff}, tokens={motion: {fast: 90}})\nroot = Text(\"Hello\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#111111",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#0f766e",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#0f766e",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#0f766e"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#0f766e",
+                        "primaryForeground": "#fafafa",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#ff00ff",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#2b8880"
+                      }
+                    }
+                  },
+                  "tokens": {
+                    "motion": {
+                      "fast": 90
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(primary=#0f766e, cardForeground=#111111, dark={ring: #ff00ff}, tokens={motion: {fast: 90}})\nroot = Text(\"Hello\")"
+    },
+    {
+      "name": "theme_aliases_read_as_seeds",
+      "action": "compile",
+      "input": "theme(mode=\"dark\", background=#101010, foreground=#f0f0f0)\nroot = Text(\"Hello\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#fbfbfb",
+                        "foreground": "#171717",
+                        "card": "#fbfbfb",
+                        "cardForeground": "#171717",
+                        "popover": "#fbfbfb",
+                        "popoverForeground": "#171717",
+                        "primary": "#292929",
+                        "primaryForeground": "#fbfbfb",
+                        "secondary": "#ededed",
+                        "secondaryForeground": "#171717",
+                        "muted": "#ededed",
+                        "mutedForeground": "#6a6a6a",
+                        "accent": "#ededed",
+                        "accentForeground": "#171717",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#171717",
+                        "warning": "#d97706",
+                        "warningForeground": "#171717",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e0e0e0",
+                        "input": "#e0e0e0",
+                        "ring": "#292929",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c68300",
+                        "chart5": "#d87700",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#292929"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#101010",
+                        "foreground": "#f0f0f0",
+                        "card": "#1b1b1b",
+                        "cardForeground": "#f0f0f0",
+                        "popover": "#1b1b1b",
+                        "popoverForeground": "#f0f0f0",
+                        "primary": "#dedede",
+                        "primaryForeground": "#101010",
+                        "secondary": "#2b2b2b",
+                        "secondaryForeground": "#f0f0f0",
+                        "muted": "#2b2b2b",
+                        "mutedForeground": "#949494",
+                        "accent": "#2b2b2b",
+                        "accentForeground": "#f0f0f0",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#101010",
+                        "success": "#22c55e",
+                        "successForeground": "#101010",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#101010",
+                        "info": "#3b82f6",
+                        "infoForeground": "#101010",
+                        "border": "#343434",
+                        "input": "#343434",
+                        "ring": "#dedede",
+                        "chart1": "#194eed",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#dedede"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(bg=#fbfbfb, fg=#171717)\nroot = Text(\"Hello\")"
+    },
+    {
+      "name": "theme_after_root_on_a_new_surface_still_creates",
+      "action": "compile",
+      "input": "root = Text(\"Hello\")\ntheme(primary=#2563eb)",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#2563eb",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#2563eb",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#2563eb"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#2563eb",
+                        "primaryForeground": "#fafafa",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#2563eb",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#3170f9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(primary=#2563eb)\nroot = Text(\"Hello\")"
+    },
+    {
+      "name": "theme_on_an_existing_surface_calls_set_theme",
+      "action": "compile",
+      "input": "surface(\"main\", update=true)\ntheme(primary=#2563eb)\nroot = Text(\"Hello\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "callRendererFunction": {
+            "surfaceId": "main",
+            "functionCallId": "call_1",
+            "callFunction": {
+              "catalogId": "express/extensions",
+              "@call": "setTheme",
+              "args": {
+                "theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#2563eb",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#2563eb",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#2563eb"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#2563eb",
+                        "primaryForeground": "#fafafa",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#2563eb",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#3170f9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "version": "1.0",
+          "updateComponents": {
+            "surfaceId": "main",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(primary=#2563eb)\nsurface(\"main\", update=true)\nroot = Text(\"Hello\")",
+      "stream": false
+    },
+    {
+      "name": "theme_alone_on_an_existing_surface",
+      "action": "compile",
+      "input": "surface(\"main\")\ntheme(\"orange\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "callRendererFunction": {
+            "surfaceId": "main",
+            "functionCallId": "call_1",
+            "callFunction": {
+              "catalogId": "express/extensions",
+              "@call": "setTheme",
+              "args": {
+                "theme": "orange"
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(\"orange\")",
+      "stream": false
+    },
+    {
+      "name": "theme_beside_other_surface_extensions",
+      "action": "compile",
+      "input": "surface(\"main\", extensions={app_mode: \"kiosk\"})\ntheme(radius=12)\nroot = Text(\"Hello\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "Hello"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "app_mode": "kiosk",
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#1e1e1e",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#1e1e1e",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#1e1e1e"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#e7e7e7",
+                        "primaryForeground": "#0a0a0a",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#e7e7e7",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#e7e7e7"
+                      }
+                    }
+                  },
+                  "tokens": {
+                    "radius": {
+                      "sm": 9,
+                      "md": 12,
+                      "lg": 15,
+                      "xl": 21,
+                      "xl2": 27,
+                      "xl3": 33
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\", extensions={app_mode: \"kiosk\"})\ntheme(radius=12)\nroot = Text(\"Hello\")"
+    },
+    {
+      "name": "theme_unknown_seed",
+      "action": "compile",
+      "input": "theme(primry=#ffffff)\nroot = Text(\"x\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "Unknown theme argument"
+      }
+    },
+    {
+      "name": "theme_bad_colour",
+      "action": "compile",
+      "input": "theme(primary=\"red\")\nroot = Text(\"x\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "#rrggbb"
+      }
+    },
+    {
+      "name": "theme_twice_via_extensions",
+      "action": "compile",
+      "input": "surface(\"main\", extensions={at_exponential_theme: \"neutral\"})\ntheme(primary=#000000)\nroot = Text(\"x\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "sets its theme twice"
+      }
+    },
+    {
+      "name": "theme_id_with_seeds",
+      "action": "compile",
+      "input": "theme(\"orange\", primary=#000000)\nroot = Text(\"x\")",
+      "expect_error": {
+        "category": "Validation",
+        "message": "built-in theme"
+      }
+    },
+    {
+      "name": "expand_defaults",
+      "action": "expand_theme",
+      "input": {},
+      "expect": {
+        "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+        "id": "express",
+        "name": "Express",
+        "extends": "neutral",
+        "modes": {
+          "light": {
+            "color": {
+              "background": "#ffffff",
+              "foreground": "#0a0a0a",
+              "card": "#ffffff",
+              "cardForeground": "#0a0a0a",
+              "popover": "#ffffff",
+              "popoverForeground": "#0a0a0a",
+              "primary": "#1e1e1e",
+              "primaryForeground": "#ffffff",
+              "secondary": "#f0f0f0",
+              "secondaryForeground": "#0a0a0a",
+              "muted": "#f0f0f0",
+              "mutedForeground": "#6c6c6c",
+              "accent": "#f0f0f0",
+              "accentForeground": "#0a0a0a",
+              "destructive": "#e7000b",
+              "destructiveForeground": "#ffffff",
+              "success": "#16a34a",
+              "successForeground": "#0a0a0a",
+              "warning": "#d97706",
+              "warningForeground": "#0a0a0a",
+              "info": "#2563eb",
+              "infoForeground": "#ffffff",
+              "border": "#e2e2e2",
+              "input": "#e2e2e2",
+              "ring": "#1e1e1e",
+              "chart1": "#f54900",
+              "chart2": "#009689",
+              "chart3": "#104e64",
+              "chart4": "#c98600",
+              "chart5": "#dc7a00",
+              "chart6": "#7c3aed",
+              "chart7": "#db2777",
+              "chart8": "#0891b2",
+              "link": "#1e1e1e"
+            }
+          },
+          "dark": {
+            "color": {
+              "background": "#0a0a0a",
+              "foreground": "#fafafa",
+              "card": "#161616",
+              "cardForeground": "#fafafa",
+              "popover": "#161616",
+              "popoverForeground": "#fafafa",
+              "primary": "#e7e7e7",
+              "primaryForeground": "#0a0a0a",
+              "secondary": "#272727",
+              "secondaryForeground": "#fafafa",
+              "muted": "#272727",
+              "mutedForeground": "#8e8e8e",
+              "accent": "#272727",
+              "accentForeground": "#fafafa",
+              "destructive": "#ff6467",
+              "destructiveForeground": "#0a0a0a",
+              "success": "#22c55e",
+              "successForeground": "#0a0a0a",
+              "warning": "#f59e0b",
+              "warningForeground": "#0a0a0a",
+              "info": "#3b82f6",
+              "infoForeground": "#0a0a0a",
+              "border": "#303030",
+              "input": "#303030",
+              "ring": "#e7e7e7",
+              "chart1": "#174bea",
+              "chart2": "#00bc7d",
+              "chart3": "#fe9a00",
+              "chart4": "#ad46ff",
+              "chart5": "#ff2056",
+              "chart6": "#a78bfa",
+              "chart7": "#f472b6",
+              "chart8": "#22d3ee",
+              "link": "#e7e7e7"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "expand_light_brand",
+      "action": "expand_theme",
+      "input": {
+        "primary": "#7c3aed",
+        "radius": 12,
+        "font": "Geist"
+      },
+      "expect": {
+        "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+        "id": "express",
+        "name": "Express",
+        "extends": "neutral",
+        "modes": {
+          "light": {
+            "color": {
+              "background": "#ffffff",
+              "foreground": "#0a0a0a",
+              "card": "#ffffff",
+              "cardForeground": "#0a0a0a",
+              "popover": "#ffffff",
+              "popoverForeground": "#0a0a0a",
+              "primary": "#7c3aed",
+              "primaryForeground": "#ffffff",
+              "secondary": "#f0f0f0",
+              "secondaryForeground": "#0a0a0a",
+              "muted": "#f0f0f0",
+              "mutedForeground": "#6c6c6c",
+              "accent": "#f0f0f0",
+              "accentForeground": "#0a0a0a",
+              "destructive": "#e7000b",
+              "destructiveForeground": "#ffffff",
+              "success": "#16a34a",
+              "successForeground": "#0a0a0a",
+              "warning": "#d97706",
+              "warningForeground": "#0a0a0a",
+              "info": "#2563eb",
+              "infoForeground": "#ffffff",
+              "border": "#e2e2e2",
+              "input": "#e2e2e2",
+              "ring": "#7c3aed",
+              "chart1": "#f54900",
+              "chart2": "#009689",
+              "chart3": "#104e64",
+              "chart4": "#c98600",
+              "chart5": "#dc7a00",
+              "chart6": "#7c3aed",
+              "chart7": "#db2777",
+              "chart8": "#0891b2",
+              "link": "#7c3aed"
+            }
+          },
+          "dark": {
+            "color": {
+              "background": "#0a0a0a",
+              "foreground": "#fafafa",
+              "card": "#161616",
+              "cardForeground": "#fafafa",
+              "popover": "#161616",
+              "popoverForeground": "#fafafa",
+              "primary": "#7c3aed",
+              "primaryForeground": "#fafafa",
+              "secondary": "#272727",
+              "secondaryForeground": "#fafafa",
+              "muted": "#272727",
+              "mutedForeground": "#8e8e8e",
+              "accent": "#272727",
+              "accentForeground": "#fafafa",
+              "destructive": "#ff6467",
+              "destructiveForeground": "#0a0a0a",
+              "success": "#22c55e",
+              "successForeground": "#0a0a0a",
+              "warning": "#f59e0b",
+              "warningForeground": "#0a0a0a",
+              "info": "#3b82f6",
+              "infoForeground": "#0a0a0a",
+              "border": "#303030",
+              "input": "#303030",
+              "ring": "#7c3aed",
+              "chart1": "#174bea",
+              "chart2": "#00bc7d",
+              "chart3": "#fe9a00",
+              "chart4": "#ad46ff",
+              "chart5": "#ff2056",
+              "chart6": "#a78bfa",
+              "chart7": "#f472b6",
+              "chart8": "#22d3ee",
+              "link": "#9054ff"
+            }
+          }
+        },
+        "tokens": {
+          "radius": {
+            "sm": 9,
+            "md": 12,
+            "lg": 15,
+            "xl": 21,
+            "xl2": 27,
+            "xl3": 33
+          },
+          "type": {
+            "family": {
+              "sans": "Geist"
+            }
+          }
+        },
+        "fonts": {
+          "Geist": {
+            "fallback": "ui-sans-serif, system-ui, sans-serif",
+            "weights": [
+              400,
+              500,
+              600,
+              700
+            ],
+            "source": "host"
+          }
+        }
+      }
+    },
+    {
+      "name": "expand_dark_brief",
+      "action": "expand_theme",
+      "input": {
+        "base": "dark",
+        "primary": "#eef800",
+        "bg": "#0e0e0e",
+        "card": "#161616",
+        "radius": 0,
+        "font": "Inter",
+        "scale": 1,
+        "density": "compact",
+        "shadow": "none",
+        "button": "pill"
+      },
+      "expect": {
+        "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+        "id": "express",
+        "name": "Express",
+        "extends": "neutral",
+        "modes": {
+          "light": {
+            "color": {
+              "background": "#fcfcfc",
+              "foreground": "#0a0a0a",
+              "card": "#f2f2f2",
+              "cardForeground": "#0a0a0a",
+              "popover": "#f2f2f2",
+              "popoverForeground": "#0a0a0a",
+              "primary": "#939900",
+              "primaryForeground": "#0a0a0a",
+              "secondary": "#ededed",
+              "secondaryForeground": "#0a0a0a",
+              "muted": "#ededed",
+              "mutedForeground": "#6b6b6b",
+              "accent": "#ededed",
+              "accentForeground": "#0a0a0a",
+              "destructive": "#e7000b",
+              "destructiveForeground": "#ffffff",
+              "success": "#16a34a",
+              "successForeground": "#0a0a0a",
+              "warning": "#d97706",
+              "warningForeground": "#0a0a0a",
+              "info": "#2563eb",
+              "infoForeground": "#ffffff",
+              "border": "#dfdfdf",
+              "input": "#dfdfdf",
+              "ring": "#939900",
+              "chart1": "#f54900",
+              "chart2": "#009689",
+              "chart3": "#104e64",
+              "chart4": "#c68300",
+              "chart5": "#d87700",
+              "chart6": "#7c3aed",
+              "chart7": "#db2777",
+              "chart8": "#0891b2",
+              "link": "#737700"
+            },
+            "shadow": {
+              "none": [],
+              "sm": [],
+              "md": [],
+              "lg": [],
+              "xl": [],
+              "popover": []
+            }
+          },
+          "dark": {
+            "color": {
+              "background": "#0e0e0e",
+              "foreground": "#fafafa",
+              "card": "#161616",
+              "cardForeground": "#fafafa",
+              "popover": "#161616",
+              "popoverForeground": "#fafafa",
+              "primary": "#eef800",
+              "primaryForeground": "#0e0e0e",
+              "secondary": "#2a2a2a",
+              "secondaryForeground": "#fafafa",
+              "muted": "#2a2a2a",
+              "mutedForeground": "#939393",
+              "accent": "#2a2a2a",
+              "accentForeground": "#fafafa",
+              "destructive": "#ff6467",
+              "destructiveForeground": "#0e0e0e",
+              "success": "#22c55e",
+              "successForeground": "#0e0e0e",
+              "warning": "#f59e0b",
+              "warningForeground": "#0e0e0e",
+              "info": "#3b82f6",
+              "infoForeground": "#0e0e0e",
+              "border": "#343434",
+              "input": "#343434",
+              "ring": "#eef800",
+              "chart1": "#194eed",
+              "chart2": "#00bc7d",
+              "chart3": "#fe9a00",
+              "chart4": "#ad46ff",
+              "chart5": "#ff2056",
+              "chart6": "#a78bfa",
+              "chart7": "#f472b6",
+              "chart8": "#22d3ee",
+              "link": "#eef800"
+            },
+            "shadow": {
+              "none": [],
+              "sm": [],
+              "md": [],
+              "lg": [],
+              "xl": [],
+              "popover": []
+            }
+          }
+        },
+        "tokens": {
+          "radius": {
+            "sm": 0,
+            "md": 0,
+            "lg": 0,
+            "xl": 0,
+            "xl2": 0,
+            "xl3": 0
+          },
+          "spacing": {
+            "xxs": 2,
+            "xs": 4,
+            "sm": 7,
+            "md": 11,
+            "lg": 14,
+            "xl": 21,
+            "xl2": 28,
+            "xl3": 42
+          },
+          "control": {
+            "buttonSm": 28,
+            "buttonMd": 32,
+            "buttonLg": 35,
+            "buttonIcon": 32,
+            "input": 32,
+            "row": 35,
+            "rowCompact": 28,
+            "pill": 21,
+            "badge": 18,
+            "chip": 25,
+            "toggle": 32
+          },
+          "type": {
+            "family": {
+              "sans": "Inter"
+            }
+          }
+        },
+        "fonts": {
+          "Inter": {
+            "fallback": "ui-sans-serif, system-ui, sans-serif",
+            "weights": [
+              400,
+              500,
+              600,
+              700
+            ],
+            "source": "host"
+          }
+        },
+        "recipes": {
+          "Button": {
+            "root": [
+              {
+                "style": {
+                  "borderRadius": "$radius.full"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "expand_everything",
+      "action": "expand_theme",
+      "input": {
+        "base": "light",
+        "bg": "#fffbf5",
+        "fg": "#1f1235",
+        "card": "#ffffff",
+        "primary": "#7c3aed",
+        "secondary": "#ccfbf1",
+        "muted": "#f3e8ff",
+        "accent": "#ffe4e6",
+        "border": "#e9d5ff",
+        "charts": [
+          "#7c3aed",
+          "#14b8a6",
+          "#f43f5e"
+        ],
+        "radius": 14,
+        "font": "Nunito",
+        "display": "Fraunces",
+        "scale": 1.125,
+        "density": "comfortable",
+        "shadow": "strong",
+        "button": "square",
+        "stroke": 2
+      },
+      "expect": {
+        "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+        "id": "express",
+        "name": "Express",
+        "extends": "neutral",
+        "modes": {
+          "light": {
+            "color": {
+              "background": "#fffbf5",
+              "foreground": "#1f1235",
+              "card": "#ffffff",
+              "cardForeground": "#1f1235",
+              "popover": "#ffffff",
+              "popoverForeground": "#1f1235",
+              "primary": "#7c3aed",
+              "primaryForeground": "#fffbf5",
+              "secondary": "#ccfbf1",
+              "secondaryForeground": "#1f1235",
+              "muted": "#f3e8ff",
+              "mutedForeground": "#6f6776",
+              "accent": "#ffe4e6",
+              "accentForeground": "#1f1235",
+              "destructive": "#e7000b",
+              "destructiveForeground": "#ffffff",
+              "success": "#16a34a",
+              "successForeground": "#1f1235",
+              "warning": "#d97706",
+              "warningForeground": "#1f1235",
+              "info": "#2563eb",
+              "infoForeground": "#ffffff",
+              "border": "#e9d5ff",
+              "input": "#e9d5ff",
+              "ring": "#7c3aed",
+              "chart1": "#7c3aed",
+              "chart2": "#00a291",
+              "chart3": "#f43f5e",
+              "chart4": "#7c3aed",
+              "chart5": "#00a291",
+              "chart6": "#f43f5e",
+              "chart7": "#7c3aed",
+              "chart8": "#00a291",
+              "link": "#7c3aed"
+            },
+            "shadow": {
+              "none": [],
+              "sm": [
+                {
+                  "x": 0,
+                  "y": 1.5,
+                  "blur": 3,
+                  "spread": 0,
+                  "color": "#0000001a"
+                }
+              ],
+              "md": [
+                {
+                  "x": 0,
+                  "y": 6,
+                  "blur": 9,
+                  "spread": -1,
+                  "color": "#00000034"
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "blur": 6,
+                  "spread": -2,
+                  "color": "#00000034"
+                }
+              ],
+              "lg": [
+                {
+                  "x": 0,
+                  "y": 15,
+                  "blur": 22.5,
+                  "spread": -3,
+                  "color": "#00000034"
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "blur": 9,
+                  "spread": -4,
+                  "color": "#00000034"
+                }
+              ],
+              "xl": [
+                {
+                  "x": 0,
+                  "y": 30,
+                  "blur": 37.5,
+                  "spread": -5,
+                  "color": "#00000034"
+                },
+                {
+                  "x": 0,
+                  "y": 12,
+                  "blur": 15,
+                  "spread": -6,
+                  "color": "#00000034"
+                }
+              ],
+              "popover": [
+                {
+                  "x": 0,
+                  "y": 6,
+                  "blur": 9,
+                  "spread": -1,
+                  "color": "#00000034"
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "blur": 6,
+                  "spread": -2,
+                  "color": "#00000034"
+                }
+              ]
+            }
+          },
+          "dark": {
+            "color": {
+              "background": "#120f0b",
+              "foreground": "#f0e2ff",
+              "card": "#0d0d0d",
+              "cardForeground": "#f0e2ff",
+              "popover": "#0d0d0d",
+              "popoverForeground": "#f0e2ff",
+              "primary": "#7c3aed",
+              "primaryForeground": "#f0e2ff",
+              "secondary": "#001f19",
+              "secondaryForeground": "#f0e2ff",
+              "muted": "#1d1525",
+              "mutedForeground": "#8c8391",
+              "accent": "#261416",
+              "accentForeground": "#f0e2ff",
+              "destructive": "#ff6467",
+              "destructiveForeground": "#120f0b",
+              "success": "#22c55e",
+              "successForeground": "#120f0b",
+              "warning": "#f59e0b",
+              "warningForeground": "#120f0b",
+              "info": "#3b82f6",
+              "infoForeground": "#120f0b",
+              "border": "#2b1b3a",
+              "input": "#2b1b3a",
+              "ring": "#7c3aed",
+              "chart1": "#7c3aed",
+              "chart2": "#00a291",
+              "chart3": "#f43f5e",
+              "chart4": "#7c3aed",
+              "chart5": "#00a291",
+              "chart6": "#f43f5e",
+              "chart7": "#7c3aed",
+              "chart8": "#00a291",
+              "link": "#9258ff"
+            },
+            "shadow": {
+              "none": [],
+              "sm": [
+                {
+                  "x": 0,
+                  "y": 1.5,
+                  "blur": 3,
+                  "spread": 0,
+                  "color": "#00000066"
+                }
+              ],
+              "md": [
+                {
+                  "x": 0,
+                  "y": 6,
+                  "blur": 9,
+                  "spread": -1,
+                  "color": "#000000cc"
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "blur": 6,
+                  "spread": -2,
+                  "color": "#000000cc"
+                }
+              ],
+              "lg": [
+                {
+                  "x": 0,
+                  "y": 15,
+                  "blur": 22.5,
+                  "spread": -3,
+                  "color": "#000000cc"
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "blur": 9,
+                  "spread": -4,
+                  "color": "#000000cc"
+                }
+              ],
+              "xl": [
+                {
+                  "x": 0,
+                  "y": 30,
+                  "blur": 37.5,
+                  "spread": -5,
+                  "color": "#000000"
+                },
+                {
+                  "x": 0,
+                  "y": 12,
+                  "blur": 15,
+                  "spread": -6,
+                  "color": "#000000"
+                }
+              ],
+              "popover": [
+                {
+                  "x": 0,
+                  "y": 6,
+                  "blur": 9,
+                  "spread": -1,
+                  "color": "#000000cc"
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "blur": 6,
+                  "spread": -2,
+                  "color": "#000000cc"
+                }
+              ]
+            }
+          }
+        },
+        "tokens": {
+          "radius": {
+            "sm": 10.5,
+            "md": 14,
+            "lg": 17.5,
+            "xl": 24.5,
+            "xl2": 31.5,
+            "xl3": 38.5
+          },
+          "type": {
+            "size": {
+              "xs": 14,
+              "sm": 16,
+              "base": 18,
+              "lg": 20,
+              "xl": 23,
+              "xl2": 27,
+              "xl3": 34
+            },
+            "lineHeight": {
+              "xs": 18,
+              "sm": 23,
+              "base": 27,
+              "lg": 32,
+              "xl": 32,
+              "xl2": 36,
+              "xl3": 41
+            },
+            "family": {
+              "sans": "Nunito",
+              "serif": "Fraunces"
+            }
+          },
+          "spacing": {
+            "xxs": 2,
+            "xs": 5,
+            "sm": 9,
+            "md": 14,
+            "lg": 18,
+            "xl": 27,
+            "xl2": 36,
+            "xl3": 54
+          },
+          "control": {
+            "buttonSm": 36,
+            "buttonMd": 41,
+            "buttonLg": 45,
+            "buttonIcon": 41,
+            "input": 41,
+            "row": 45,
+            "rowCompact": 36,
+            "pill": 27,
+            "badge": 23,
+            "chip": 32,
+            "toggle": 41
+          },
+          "border": {
+            "hairline": 2
+          }
+        },
+        "fonts": {
+          "Nunito": {
+            "fallback": "ui-sans-serif, system-ui, sans-serif",
+            "weights": [
+              400,
+              500,
+              600,
+              700
+            ],
+            "source": "host"
+          },
+          "Fraunces": {
+            "fallback": "ui-serif, Georgia, serif",
+            "weights": [
+              400,
+              600,
+              700
+            ],
+            "source": "host"
+          }
+        },
+        "recipes": {
+          "Heading": {
+            "root": [
+              {
+                "style": {
+                  "fontFamily": "$type.family.serif"
+                }
+              }
+            ]
+          },
+          "Button": {
+            "root": [
+              {
+                "style": {
+                  "borderRadius": "$radius.none"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "expand_low_contrast_seed_is_lifted_in_the_other_mode",
+      "action": "expand_theme",
+      "input": {
+        "primary": "#facc15"
+      },
+      "expect": {
+        "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+        "id": "express",
+        "name": "Express",
+        "extends": "neutral",
+        "modes": {
+          "light": {
+            "color": {
+              "background": "#ffffff",
+              "foreground": "#0a0a0a",
+              "card": "#ffffff",
+              "cardForeground": "#0a0a0a",
+              "popover": "#ffffff",
+              "popoverForeground": "#0a0a0a",
+              "primary": "#facc15",
+              "primaryForeground": "#0a0a0a",
+              "secondary": "#f0f0f0",
+              "secondaryForeground": "#0a0a0a",
+              "muted": "#f0f0f0",
+              "mutedForeground": "#6c6c6c",
+              "accent": "#f0f0f0",
+              "accentForeground": "#0a0a0a",
+              "destructive": "#e7000b",
+              "destructiveForeground": "#ffffff",
+              "success": "#16a34a",
+              "successForeground": "#0a0a0a",
+              "warning": "#d97706",
+              "warningForeground": "#0a0a0a",
+              "info": "#2563eb",
+              "infoForeground": "#ffffff",
+              "border": "#e2e2e2",
+              "input": "#e2e2e2",
+              "ring": "#b98c00",
+              "chart1": "#f54900",
+              "chart2": "#009689",
+              "chart3": "#104e64",
+              "chart4": "#c98600",
+              "chart5": "#dc7a00",
+              "chart6": "#7c3aed",
+              "chart7": "#db2777",
+              "chart8": "#0891b2",
+              "link": "#996d00"
+            }
+          },
+          "dark": {
+            "color": {
+              "background": "#0a0a0a",
+              "foreground": "#fafafa",
+              "card": "#161616",
+              "cardForeground": "#fafafa",
+              "popover": "#161616",
+              "popoverForeground": "#fafafa",
+              "primary": "#facc15",
+              "primaryForeground": "#0a0a0a",
+              "secondary": "#272727",
+              "secondaryForeground": "#fafafa",
+              "muted": "#272727",
+              "mutedForeground": "#8e8e8e",
+              "accent": "#272727",
+              "accentForeground": "#fafafa",
+              "destructive": "#ff6467",
+              "destructiveForeground": "#0a0a0a",
+              "success": "#22c55e",
+              "successForeground": "#0a0a0a",
+              "warning": "#f59e0b",
+              "warningForeground": "#0a0a0a",
+              "info": "#3b82f6",
+              "infoForeground": "#0a0a0a",
+              "border": "#303030",
+              "input": "#303030",
+              "ring": "#facc15",
+              "chart1": "#174bea",
+              "chart2": "#00bc7d",
+              "chart3": "#fe9a00",
+              "chart4": "#ad46ff",
+              "chart5": "#ff2056",
+              "chart6": "#a78bfa",
+              "chart7": "#f472b6",
+              "chart8": "#22d3ee",
+              "link": "#facc15"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "expand_refuses_bad_density",
+      "action": "expand_theme",
+      "input": {
+        "density": "tight"
+      },
+      "expect_error": {
+        "message": "density"
+      }
+    }
+  ]
+}

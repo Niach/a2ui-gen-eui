@@ -1,0 +1,373 @@
+{
+  "description": "#rrggbb / #rrggbbaa colour literals: read inside theme(...) only; elsewhere a # still starts a comment, and a colour literal outside theme() is refused.",
+  "catalog": "catalog.json",
+  "cases": [
+    {
+      "name": "hex_six_and_eight_digits",
+      "action": "compile",
+      "input": "theme(primary=#7C3AED, border=#ffffff1a)\nroot = Text(\"x\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#7c3aed",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#ffffff1a",
+                        "input": "#ffffff1a",
+                        "ring": "#7c3aed",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#7c3aed"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#7c3aed",
+                        "primaryForeground": "#fafafa",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#0d0d0d1a",
+                        "input": "#0d0d0d1a",
+                        "ring": "#7c3aed",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#9054ff"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(primary=#7c3aed, border=#ffffff1a)\nroot = Text(\"x\")"
+    },
+    {
+      "name": "hex_comment_still_a_comment",
+      "action": "compile",
+      "input": "# a comment line\nroot = Text(\"x\") # trailing comment",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x"
+              }
+            ]
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\nroot = Text(\"x\")"
+    },
+    {
+      "name": "hex_in_a_list_and_a_map",
+      "action": "compile",
+      "input": "theme(charts=[#ef4444, #22c55e], light={ring: #a1a1a1})\nroot = Text(\"x\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#1e1e1e",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#a1a1a1",
+                        "chart1": "#ef4444",
+                        "chart2": "#00ab45",
+                        "chart3": "#ef4444",
+                        "chart4": "#00ab45",
+                        "chart5": "#ef4444",
+                        "chart6": "#00ab45",
+                        "chart7": "#ef4444",
+                        "chart8": "#00ab45",
+                        "link": "#1e1e1e"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#e7e7e7",
+                        "primaryForeground": "#0a0a0a",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#e7e7e7",
+                        "chart1": "#ef4444",
+                        "chart2": "#00ab45",
+                        "chart3": "#ef4444",
+                        "chart4": "#00ab45",
+                        "chart5": "#ef4444",
+                        "chart6": "#00ab45",
+                        "chart7": "#ef4444",
+                        "chart8": "#00ab45",
+                        "link": "#e7e7e7"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(charts=[#ef4444, #00ab45], ring=#a1a1a1)\nroot = Text(\"x\")"
+    },
+    {
+      "name": "hex_quoted_string_is_the_same",
+      "action": "compile",
+      "input": "theme(primary=\"#7c3aed\")\nroot = Text(\"x\")",
+      "expect": [
+        {
+          "version": "1.0",
+          "createSurface": {
+            "surfaceId": "main",
+            "catalogId": "express/extensions",
+            "components": [
+              {
+                "id": "root",
+                "component": "Text",
+                "text": "x"
+              }
+            ],
+            "metadata": {
+              "extensions": {
+                "at_exponential_theme": {
+                  "$schema": "https://ui.exponential.at/schemas/theme/v1.json",
+                  "id": "express",
+                  "name": "Express",
+                  "extends": "neutral",
+                  "modes": {
+                    "light": {
+                      "color": {
+                        "background": "#ffffff",
+                        "foreground": "#0a0a0a",
+                        "card": "#ffffff",
+                        "cardForeground": "#0a0a0a",
+                        "popover": "#ffffff",
+                        "popoverForeground": "#0a0a0a",
+                        "primary": "#7c3aed",
+                        "primaryForeground": "#ffffff",
+                        "secondary": "#f0f0f0",
+                        "secondaryForeground": "#0a0a0a",
+                        "muted": "#f0f0f0",
+                        "mutedForeground": "#6c6c6c",
+                        "accent": "#f0f0f0",
+                        "accentForeground": "#0a0a0a",
+                        "destructive": "#e7000b",
+                        "destructiveForeground": "#ffffff",
+                        "success": "#16a34a",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#d97706",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#2563eb",
+                        "infoForeground": "#ffffff",
+                        "border": "#e2e2e2",
+                        "input": "#e2e2e2",
+                        "ring": "#7c3aed",
+                        "chart1": "#f54900",
+                        "chart2": "#009689",
+                        "chart3": "#104e64",
+                        "chart4": "#c98600",
+                        "chart5": "#dc7a00",
+                        "chart6": "#7c3aed",
+                        "chart7": "#db2777",
+                        "chart8": "#0891b2",
+                        "link": "#7c3aed"
+                      }
+                    },
+                    "dark": {
+                      "color": {
+                        "background": "#0a0a0a",
+                        "foreground": "#fafafa",
+                        "card": "#161616",
+                        "cardForeground": "#fafafa",
+                        "popover": "#161616",
+                        "popoverForeground": "#fafafa",
+                        "primary": "#7c3aed",
+                        "primaryForeground": "#fafafa",
+                        "secondary": "#272727",
+                        "secondaryForeground": "#fafafa",
+                        "muted": "#272727",
+                        "mutedForeground": "#8e8e8e",
+                        "accent": "#272727",
+                        "accentForeground": "#fafafa",
+                        "destructive": "#ff6467",
+                        "destructiveForeground": "#0a0a0a",
+                        "success": "#22c55e",
+                        "successForeground": "#0a0a0a",
+                        "warning": "#f59e0b",
+                        "warningForeground": "#0a0a0a",
+                        "info": "#3b82f6",
+                        "infoForeground": "#0a0a0a",
+                        "border": "#303030",
+                        "input": "#303030",
+                        "ring": "#7c3aed",
+                        "chart1": "#174bea",
+                        "chart2": "#00bc7d",
+                        "chart3": "#fe9a00",
+                        "chart4": "#ad46ff",
+                        "chart5": "#ff2056",
+                        "chart6": "#a78bfa",
+                        "chart7": "#f472b6",
+                        "chart8": "#22d3ee",
+                        "link": "#9054ff"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "decompiled": "surface(\"main\")\ntheme(primary=#7c3aed)\nroot = Text(\"x\")"
+    },
+    {
+      "name": "hex_outside_theme_is_refused",
+      "action": "compile",
+      "input": "root = Text(\"x\", style={color: #ff0000})",
+      "expect_error": {
+        "category": "Validation",
+        "message": "only valid inside theme"
+      }
+    },
+    {
+      "name": "hex_seven_digits_is_a_comment",
+      "action": "compile",
+      "input": "theme(primary=#1234567)\nroot = Text(\"x\")",
+      "expect_error": {}
+    }
+  ]
+}
