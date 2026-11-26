@@ -4,8 +4,8 @@ version = 4
 
 [[package]]
 name = "a2ui-express"
-version = "0.2.0"
-source = "git+https://github.com/Niach/a2ui-express-compiler-rust?rev=40fa2f4aef81381b0378f814583f49c2b5910a73#40fa2f4aef81381b0378f814583f49c2b5910a73"
+version = "0.3.0"
+source = "git+https://github.com/Niach/a2ui-express-compiler-rust?rev=92bddc0866a68e8b3903ac1278fbf434b1b73445#92bddc0866a68e8b3903ac1278fbf434b1b73445"
 dependencies = [
  "serde_json",
  "thiserror",
