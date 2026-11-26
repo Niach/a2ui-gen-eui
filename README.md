@@ -58,6 +58,14 @@ are the ones the models were tuned for; `generate_with` / `refine_with` change t
 and its signatures go into the system prompt. The default models know eui's catalog by heart and were not
 trained on others, so expect valid but less fitting screens.
 
+**Express extensions.** A catalog that declares a2ui-express's `at_exponential_express` extension
+(`metadata.extensions`) also gets the extension's forms in its grammars, generated from the tables the
+compiler reads: `theme(...)` before `root` (`#rrggbb[aa]` colours only there), `style(name, "words")`,
+`s="col g12 p16 bg-card"` / `s=<class>`, `enter=` / `exit=` / `stagger=` / `delay=`, Motion `ref=` and
+`kf=`. `grammar::lark_patch` / `grammar::gbnf_patch` (`Catalog::lark_patch`) take a patch, with `del(name)`
+and `del($/path)`. In GBNF a style class name is any identifier; the Lark grammar also refuses one that reads
+as a shorthand word. eui's built-in catalog does not declare the extension, so its grammar is unchanged.
+
 Without the default feature `llama` the crate has no native code: prompts, grammars (`grammar::gbnf` for
 llama.cpp and vLLM, `grammar::lark` for llguidance), streaming and validation.
 

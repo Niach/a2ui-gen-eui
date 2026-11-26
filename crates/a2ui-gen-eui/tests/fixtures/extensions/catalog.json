@@ -1,0 +1,396 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui.exponential.at/conformance/express-extensions/v1",
+  "catalogId": "express/extensions",
+  "protocolVersion": "1.0",
+  "title": "Express extension conformance catalog",
+  "description": "A small eUI-shaped catalog that declares the at_exponential_express extension (its Motion registry included) and the setTheme renderer function, for conformance/extensions/*.json.",
+  "metadata": {
+    "extensions": {
+      "at_exponential_express": {
+        "version": 1,
+        "themeFunction": "setTheme",
+        "motions": {
+          "pulse-dot": {
+            "size": [
+              24,
+              24
+            ],
+            "duration": 1200,
+            "layers": [
+              {
+                "type": "shape",
+                "transform": {
+                  "anchor": [
+                    12,
+                    12
+                  ],
+                  "position": [
+                    12,
+                    12
+                  ],
+                  "scale": {
+                    "keys": [
+                      {
+                        "t": 0,
+                        "v": [
+                          100,
+                          100
+                        ],
+                        "ease": "ease-in-out"
+                      },
+                      {
+                        "t": 600,
+                        "v": [
+                          140,
+                          140
+                        ],
+                        "ease": "ease-in-out"
+                      },
+                      {
+                        "t": 1200,
+                        "v": [
+                          100,
+                          100
+                        ]
+                      }
+                    ]
+                  },
+                  "opacity": {
+                    "keys": [
+                      {
+                        "t": 0,
+                        "v": 100,
+                        "ease": "ease-in-out"
+                      },
+                      {
+                        "t": 600,
+                        "v": 40,
+                        "ease": "ease-in-out"
+                      },
+                      {
+                        "t": 1200,
+                        "v": 100
+                      }
+                    ]
+                  }
+                },
+                "shapes": [
+                  {
+                    "type": "ellipse",
+                    "position": [
+                      12,
+                      12
+                    ],
+                    "size": [
+                      12,
+                      12
+                    ]
+                  },
+                  {
+                    "type": "fill",
+                    "color": "$color.primary"
+                  }
+                ]
+              }
+            ]
+          },
+          "spinner": {
+            "size": [
+              24,
+              24
+            ],
+            "duration": 900,
+            "layers": [
+              {
+                "type": "shape",
+                "transform": {
+                  "anchor": [
+                    12,
+                    12
+                  ],
+                  "position": [
+                    12,
+                    12
+                  ],
+                  "rotation": {
+                    "keys": [
+                      {
+                        "t": 0,
+                        "v": 0
+                      },
+                      {
+                        "t": 900,
+                        "v": 360
+                      }
+                    ]
+                  }
+                },
+                "shapes": [
+                  {
+                    "type": "ellipse",
+                    "position": [
+                      12,
+                      12
+                    ],
+                    "size": [
+                      18,
+                      18
+                    ]
+                  },
+                  {
+                    "type": "stroke",
+                    "color": "$color.primary",
+                    "width": 3
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "Text": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Text"
+        },
+        "text": {
+          "$ref": "common_types.json#/$defs/DynamicString"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "body",
+            "caption",
+            "title"
+          ]
+        },
+        "style": {
+          "type": "object",
+          "description": "eUI Box style (catalog/style.json)."
+        }
+      },
+      "required": [
+        "component",
+        "text"
+      ]
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Column"
+        },
+        "children": {
+          "$ref": "common_types.json#/$defs/ChildList"
+        },
+        "style": {
+          "type": "object",
+          "description": "eUI Box style (catalog/style.json)."
+        }
+      },
+      "required": [
+        "component",
+        "children"
+      ]
+    },
+    "Row": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Row"
+        },
+        "children": {
+          "$ref": "common_types.json#/$defs/ChildList"
+        },
+        "style": {
+          "type": "object",
+          "description": "eUI Box style (catalog/style.json)."
+        }
+      },
+      "required": [
+        "component",
+        "children"
+      ]
+    },
+    "Card": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Card"
+        },
+        "child": {
+          "$ref": "common_types.json#/$defs/ComponentId"
+        },
+        "style": {
+          "type": "object",
+          "description": "eUI Box style (catalog/style.json)."
+        }
+      },
+      "required": [
+        "component",
+        "child"
+      ]
+    },
+    "Button": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Button"
+        },
+        "label": {
+          "$ref": "common_types.json#/$defs/DynamicString"
+        },
+        "action": {
+          "$ref": "common_types.json#/$defs/Action"
+        },
+        "style": {
+          "type": "object",
+          "description": "eUI Box style (catalog/style.json)."
+        }
+      },
+      "required": [
+        "component",
+        "label"
+      ]
+    },
+    "Motion": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Motion"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "size": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "duration": {
+          "type": "number"
+        },
+        "fps": {
+          "type": "number"
+        },
+        "loop": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "style": {
+          "type": "object",
+          "description": "eUI Box style (catalog/style.json)."
+        }
+      },
+      "required": [
+        "component"
+      ]
+    }
+  },
+  "functions": {
+    "setTheme": {
+      "type": "object",
+      "description": "Changes the surface's theme: a built-in theme id or a full eUI theme.",
+      "returnType": "void",
+      "allowedCallers": "rendererOrAgent",
+      "properties": {
+        "@call": {
+          "const": "setTheme"
+        },
+        "args": {
+          "type": "object",
+          "properties": {
+            "theme": {
+              "description": "A built-in theme id or an eUI theme (https://ui.exponential.at/schemas/theme/v1.json)."
+            }
+          },
+          "required": [
+            "theme"
+          ],
+          "unevaluatedProperties": false
+        }
+      },
+      "required": [
+        "@call",
+        "args"
+      ]
+    },
+    "formatString": {
+      "type": "object",
+      "description": "Interpolates data model values into a template string.",
+      "returnType": "string",
+      "properties": {
+        "@call": {
+          "const": "formatString"
+        },
+        "args": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "common_types.json#/$defs/DynamicString"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unevaluatedProperties": false
+        }
+      },
+      "required": [
+        "@call",
+        "args"
+      ]
+    }
+  },
+  "$defs": {
+    "anyComponent": {
+      "oneOf": [
+        {
+          "$ref": "#/components/Text"
+        },
+        {
+          "$ref": "#/components/Column"
+        },
+        {
+          "$ref": "#/components/Row"
+        },
+        {
+          "$ref": "#/components/Card"
+        },
+        {
+          "$ref": "#/components/Button"
+        },
+        {
+          "$ref": "#/components/Motion"
+        }
+      ],
+      "discriminator": {
+        "propertyName": "component"
+      }
+    },
+    "anyFunction": {
+      "oneOf": [
+        {
+          "$ref": "#/functions/setTheme"
+        },
+        {
+          "$ref": "#/functions/formatString"
+        }
+      ],
+      "discriminator": {
+        "propertyName": "@call"
+      }
+    }
+  }
+}
