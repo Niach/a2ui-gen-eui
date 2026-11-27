@@ -3,8 +3,13 @@
 //! The grammar pins down the frame (`<a2ui>`, `surface("main")`, data lines, `root = …` as the first
 //! component, one statement per line, `</a2ui>`), per component the property names, per property the
 //! values its schema allows, and the function names. It is the canonical spelling the Express decompiler
-//! writes (`name = Component(key=value, …)`). Being context-free, it cannot check ids: that a referenced
-//! id is defined, once, is left to the compiler ([`crate::Catalog::validate`]).
+//! writes (`name = Component(key=value, …)`), with a child written inline where an id goes. Being
+//! context-free, it cannot check ids: that a referenced id is defined, once, is left to the compiler
+//! ([`crate::Catalog::validate`]); it only keeps a screen from defining `root` twice.
+//!
+//! Syntax is ASCII: identifiers are `[A-Za-z_][A-Za-z0-9_]*`, so a lookalike (`＝`, `（`, `，`) can stand
+//! only inside a string. Every repetition is bounded (names, numbers, strings, items, arguments,
+//! statements), so a model caught in a loop meets the end of the grammar before its token limit.
 //!
 //! Two spellings of the same grammar: [`lark`] for llguidance, which this crate decodes with, and [`gbnf`]
 //! for llama.cpp, vLLM (xgrammar) and others.
@@ -13,8 +18,10 @@
 //! (`docs/express-extensions.md` there), generated from the tables its compiler reads: a `theme(...)`
 //! line before `root` (`#rrggbb[aa]` colours only there), `style(name, "words")` classes, `s=` on every
 //! component, `enter=` / `exit=` / `stagger=` / `delay=`, Motion `ref=` (over the catalog's registry) and
-//! `kf=`, and [`lark_patch`] / [`gbnf_patch`] for patches (`del(name)`, `del($/path)`). A catalog that
-//! does not declare it gets the same grammar as before, byte for byte.
+//! `kf=`, and [`lark_patch`] / [`gbnf_patch`] for patches (`del(name)`, `del($/path)`). A screen defines
+//! its classes as the decompiler names them, `k1`, `k2`, … in order, between its data and `root`; a
+//! style string holds only the style table's words and those names. A patch may also break a statement
+//! over indented lines.
 
 use std::collections::HashMap;
 
@@ -23,40 +30,115 @@ use serde_json::Value;
 
 const COMMON: &str = "common_types.json#/$defs/";
 
-const SHARED: &str = r#"
-call ::= fname "(" (arg ("," ws arg)*)? ")"
+/// How many more of a repeated item a rule takes after the first: a model caught in a loop runs into the
+/// bound instead of the reply's token limit. Each is well above what the canonical screens need.
+const MORE_ITEMS: usize = 127;
+const MORE_ENTRIES: usize = 63;
+const MORE_ARGS: usize = 31;
+/// Statements: data lines before `root`, statements after it, and those of a patch.
+const MAX_DATA: usize = 64;
+const MAX_STMTS: usize = 300;
+const MAX_PATCH_STMTS: usize = 256;
+/// Classes a screen defines: `style(k1, …)` to `style(k64, …)`, in that order.
+const MAX_CLASSES: usize = 64;
+
+/// The rules every grammar shares. `sep` is the spelling between two items, `open` / `close` what may
+/// follow an opening bracket and precede a closing one (nothing on one line, a line break in a patch).
+fn shared(l: &Layout) -> String {
+    let Layout {
+        sep,
+        open,
+        close,
+        colon,
+        ..
+    } = l;
+    let more = |item: &str, n: usize| format!("{item} ({sep} {item}){{0,{n}}}");
+    let args = more("arg", MORE_ARGS);
+    let anys = more("any", MORE_ITEMS);
+    let anykv = more(&format!("key {colon} any"), MORE_ENTRIES);
+    let datas = more("dataval", MORE_ITEMS);
+    let datakv = more(&format!("key {colon} dataval"), MORE_ENTRIES);
+    let checkl = more("check", MORE_ITEMS);
+    let actions = more("(event | call)", MORE_ITEMS);
+    let ids = more("idref", MORE_ITEMS);
+    format!(
+        r#"call ::= fname "("{open} ({args})?{close} ")"
 arg ::= (ident "=")? any
-anylist ::= "[" (any ("," ws any)*)? "]"
-anymap ::= "{" (key ":" ws any ("," ws key ":" ws any)*)? "}"
+anylist ::= "["{open} ({anys})?{close} "]"
+anymap ::= "{{"{open} ({anykv})?{close} "}}"
 any ::= string | number | boolean | "null" | path | event | template | call | anylist | anymap | ident | check
-check ::= "?" fname ("(" (arg ("," ws arg)*)? ")")?
+check ::= "?" fname ("(" ({args})? ")")?
 dataval ::= string | number | boolean | "null" | path | event | template | call | datalist | datamap | check
-datalist ::= "[" (dataval ("," ws dataval)*)? "]"
-datamap ::= "{" (key ":" ws dataval ("," ws key ":" ws dataval)*)? "}"
-checks ::= check | "[" (check ("," ws check)*)? "]"
-event ::= "Event(" string ("," ws anymap)? ("," ws "userMessage=" (string | path | call))? ")"
-action ::= event | call | "[" (event | call) ("," ws (event | call))* "]" | anymap
-idref ::= ident | string
-idlist ::= "[" (idref ("," ws idref)*)? "]"
-template ::= "_template(" path "," ws ident ("," ws ident "=" any)* ")"
-children ::= idlist | template
+datalist ::= "["{open} ({datas})?{close} "]"
+datamap ::= "{{"{open} ({datakv})?{close} "}}"
+checks ::= check | "[" ({checkl})? "]"
+event ::= "Event("{open} string ({sep} anymap)? ({sep} "userMessage=" (string | path | call))?{close} ")"
+action ::= event | call | "[" {actions} "]" | anymap
+idref ::= ident | string | component
+idlist ::= "["{open} ({ids})?{close} "]"
+template ::= "_template(" path {sep} ident ({sep} ident "=" any){{0,{MORE_ARGS}}} ")"
+children ::= idlist | template | idref
 key ::= ident | string
 boolean ::= "true" | "false"
 ws ::= " "
-"#;
+"#
+    )
+}
+
+/// The spelling of the space between items (see [`shared`]).
+struct Layout {
+    sep: String,
+    open: String,
+    close: String,
+    /// After a map key.
+    colon: String,
+    /// After a property's `=`.
+    assign: String,
+}
+
+impl Layout {
+    /// One statement per line, `, ` between items: the spelling of a screen.
+    fn line() -> Layout {
+        Layout {
+            sep: "\", \"".into(),
+            open: String::new(),
+            close: String::new(),
+            colon: "\": \"".into(),
+            assign: String::new(),
+        }
+    }
+
+    /// A patch may also break a statement over lines, an item per line, indented (`xnl`).
+    fn lines() -> Layout {
+        Layout {
+            sep: "xsep".into(),
+            open: " xnl?".into(),
+            close: " xnl?".into(),
+            colon: "\":\" ws?".into(),
+            assign: " xnl?".into(),
+        }
+    }
+
+    /// `[item, …]` with at most `1 + more` items.
+    fn list(&self, item: &str, more: usize) -> String {
+        let Layout { sep, open, close, .. } = self;
+        format!("\"[\"{open} ({item} ({sep} {item}){{0,{more}}})?{close} \"]\"")
+    }
+}
 
 const GBNF_TOKENS: &str = r#"
-ident ::= ([A-Za-z_] | [^\x00-\x7F]) ([A-Za-z0-9_] | [^\x00-\x7F])*
-string ::= "\"\"\"" tchar* "\"\"\"" | "r\"\"\"" rtchar* "\"\"\"" | "r\"" [^"\n]* "\"" | "\"" char* "\""
+ident ::= [A-Za-z_] [A-Za-z0-9_]{0,63}
+string ::= "\"\"\"" tchar{0,4096} "\"\"\"" | "r\"\"\"" rtchar{0,4096} "\"\"\"" | "r\"" [^"\n]{0,4096} "\"" | "\"" char{0,4096} "\""
 rtchar ::= [^"] | "\"" [^"] | "\"\"" [^"]
 char ::= [^"\\\n] | "\\" [^\n]
 tchar ::= [^"\\] | "\\" [^\n] | "\"" [^"\\] | "\"\"" [^"\\]
-number ::= "-"? [0-9]+ ("." [0-9]+)? ([eE] [-+]? [0-9]+)?
-path ::= "$" [A-Za-z0-9_/]*
-abspath ::= "$/" | "$" ("/" [A-Za-z0-9_]+)+
+number ::= "-"? [0-9]{1,20} ("." [0-9]{1,20})? ([eE] [-+]? [0-9]{1,3})?
+path ::= "$" ("/"? [A-Za-z0-9_]{1,64} ("/" [A-Za-z0-9_]{1,64}){0,7} | "/")?
+abspath ::= "$/" | "$" ("/" [A-Za-z0-9_]{1,64}){1,8}
 "#;
 
-// Lengths are bounded, so a model caught in a loop cannot spend a whole reply on one name or number.
+// Identifiers are ASCII: a lookalike (`＝`, `（`, `，`) can only stand inside a string. Lengths are bounded, so a
+// model caught in a loop cannot spend a whole reply on one name or number.
 // The lexer matches greedily, so a string is one terminal for all four forms.
 const LARK_TOKENS: &str = r#"
 ident: IDENT
@@ -64,7 +146,7 @@ string: STRING
 number: NUMBER
 path: PATH
 abspath: ABSPATH
-IDENT: /[\p{XID_Start}_][\p{XID_Continue}]{0,255}/
+IDENT: /[A-Za-z_][A-Za-z0-9_]{0,63}/
 STRING: /"""([^"\\]|\\[^\n]|"[^"\\]|""[^"\\])*"""|r"""([^"]|"[^"]|""[^"])*"""|r"[^"\n]*"|"([^"\\\n]|\\[^\n])*"/
 NUMBER: /-?[0-9]{1,20}(\.[0-9]{1,20})?([eE][-+]?[0-9]{1,3})?/
 PATH: /\$(\/?[A-Za-z0-9_]{1,64}(\/[A-Za-z0-9_]{1,64}){0,7}|\/)?/
@@ -127,6 +209,7 @@ struct Builder<'a> {
     catalog: &'a Value,
     dialect: Dialect,
     ext: Option<Ext>,
+    layout: Layout,
     rules: Vec<(String, String)>,
     /// Rule body (or `ref:<name>`) to rule name.
     memo: HashMap<String, String>,
@@ -143,6 +226,7 @@ impl<'a> Builder<'a> {
             catalog,
             dialect,
             ext: Ext::of(catalog),
+            layout: Layout::line(),
             rules: Vec::new(),
             memo: HashMap::new(),
         }
@@ -245,7 +329,8 @@ impl<'a> Builder<'a> {
                         if item == "idref" {
                             return "idlist".into();
                         }
-                        self.rule(format!("\"[\" ({item} (\",\" ws {item})*)? \"]\""), "list")
+                        let body = self.layout.list(&item, MORE_ITEMS);
+                        self.rule(body, "list")
                     }
                     _ => "anylist".into(),
                 },
@@ -264,18 +349,33 @@ impl<'a> Builder<'a> {
         if props.is_empty() && !extra.is_some_and(Value::is_object) {
             return "anymap".into();
         }
+        let colon = self.layout.colon.clone();
+        let values: Vec<String> = props.values().map(|v| self.conv(v)).collect();
+        // an `on` map: any event name takes an action, and a call (`on=set(…)`) stands for the map
+        let events = !values.is_empty() && values.iter().all(|v| v == "action");
         let mut alts: Vec<String> = props
-            .iter()
-            .map(|(k, v)| format!("{} {}", lit(&format!("{k}: ")), self.conv(v)))
+            .keys()
+            .zip(&values)
+            .map(|(k, v)| format!("{} {colon} {v}", lit(k)))
             .collect();
         match extra {
-            Some(e) if e.is_object() => alts.push(format!("key \":\" ws {}", self.conv(e))),
+            _ if events => alts.push(format!("key {colon} action")),
+            Some(e) if e.is_object() => {
+                let value = self.conv(e);
+                alts.push(format!("key {colon} {value}"))
+            }
             Some(Value::Bool(false)) => {}
             _ if s.get("unevaluatedProperties") == Some(&Value::Bool(false)) => {}
-            _ => alts.push("key \":\" ws any".into()),
+            _ => alts.push(format!("key {colon} any")),
         }
         let kv = self.rule(alts.join(" | "), "kv");
-        self.rule(format!("\"{{\" ({kv} (\",\" ws {kv})*)? \"}}\""), "map")
+        let Layout { sep, open, close, .. } = &self.layout;
+        let body = format!("\"{{\"{open} ({kv} ({sep} {kv}){{0,{MORE_ENTRIES}}})?{close} \"}}\"");
+        let map = self.rule(body, "map");
+        if events {
+            return self.union(vec![map, "call".into()]);
+        }
+        map
     }
 
     fn reference(&mut self, r: &str) -> String {
@@ -285,7 +385,8 @@ impl<'a> Builder<'a> {
                 "DynamicNumber" => self.strs(&["number", "path", "call"]),
                 "DynamicBoolean" => self.strs(&["boolean", "path", "call"]),
                 "DynamicStringList" => {
-                    let list = self.rule("\"[\" (string (\",\" ws string)*)? \"]\"".into(), "strs");
+                    let body = self.layout.list("string", MORE_ITEMS);
+                    let list = self.rule(body, "strs");
                     self.strs(&[&list, "path", "call"])
                 }
                 "DataBinding" => "path".into(),
@@ -350,8 +451,14 @@ impl<'a> Builder<'a> {
                 // the check rules' envelope key, written inline; Express spells it `checks=`
                 "@checks" => checkable = true,
                 p if p.starts_with('@') => {}
-                "style" => alts.push("\"style=\" anymap".into()),
-                _ => alts.push(format!("{} {}", lit(&format!("{p}=")), self.conv(s))),
+                "style" => alts.push(format!("\"style=\"{} anymap", self.layout.assign)),
+                // `null` leaves a property unset
+                _ => {
+                    let value = self.conv(s);
+                    let null = self.rule("\"null\"".into(), "null");
+                    let value = self.union(vec![value, null]);
+                    alts.push(format!("{}{} {value}", lit(&format!("{p}=")), self.layout.assign))
+                }
             }
         }
         // a `checks` property of the component's own is an ordinary one, with the schema it declares
@@ -392,7 +499,11 @@ impl<'a> Builder<'a> {
             alts.push("\"visible=\" any".into());
         }
         let kw = self.rule(alts.join(" | "), "kw");
-        format!("{} ({kw} (\",\" ws {kw})*)? \")\"", lit(&format!("{name}(")))
+        let Layout { sep, open, close, .. } = &self.layout;
+        format!(
+            "{}{open} ({kw} ({sep} {kw}){{0,{MORE_ARGS}}})?{close} \")\"",
+            lit(&format!("{name}("))
+        )
     }
 
     /// An enum of string values.
@@ -402,6 +513,9 @@ impl<'a> Builder<'a> {
     }
 
     fn build(mut self, patch: bool) -> String {
+        if patch {
+            self.layout = Layout::lines();
+        }
         let empty = serde_json::Map::new();
         let catalog = self.catalog;
         let object = |key: &str| catalog.get(key).and_then(Value::as_object).unwrap_or(&empty);
@@ -421,22 +535,28 @@ impl<'a> Builder<'a> {
             Dialect::Gbnf => "root",
             Dialect::Lark => "start",
         };
+        let reply = lit(crate::prompt::REPLY_START);
+        // A screen's statements after `root` define other ids, so none of them is `root` again.
         let frame = match (&self.ext, patch) {
             (None, _) => format!(
-                "{start} ::= {} (data \"\\n\")* \"root = \" component \"\\n\" (stmt \"\\n\")* \"</a2ui>\"\n\
-                 stmt ::= data | ident \" = \" component\n",
-                lit(crate::prompt::REPLY_START)
+                "{start} ::= {reply} (data \"\\n\"){{0,{MAX_DATA}}} \"root = \" component \"\\n\" (stmt \"\\n\"){{0,{MAX_STMTS}}} \"</a2ui>\"\n\
+                 stmt ::= data | xid \" = \" component\n"
             ),
-            // a theme is part of the surface it creates, so it comes before `root`; a class before its first use
+            // The decompiler's order: a theme (part of the surface it creates, so before `root`), data,
+            // then the classes `k1`, `k2`, … each once, in order (a class before its first use).
             (Some(_), false) => format!(
-                "{start} ::= {} (pre \"\\n\")* \"root = \" component \"\\n\" (stmt \"\\n\")* \"</a2ui>\"\n\
-                 pre ::= data | xtheme | xstyle\n\
-                 stmt ::= data | ident \" = \" component | xstyle\n",
-                lit(crate::prompt::REPLY_START)
+                "{start} ::= {reply} (xtheme \"\\n\")? (data \"\\n\"){{0,{MAX_DATA}}} (xclasses \"\\n\")? \"root = \" component \"\\n\" (stmt \"\\n\"){{0,{MAX_STMTS}}} \"</a2ui>\"\n\
+                 stmt ::= data | xid \" = \" component\n\
+                 {}",
+                classes()
             ),
+            // a blank line may part two statements; the classes are the screen's, so any `k<n>`
             (Some(_), true) => format!(
-                "{start} ::= {} (stmt \"\\n\")+ \"</a2ui>\"\n\
-                 stmt ::= data | ident \" = \" component | xtheme | xstyle | xdel\n",
+                "{start} ::= {} (stmt \"\\n\" \"\\n\"?){{1,{MAX_PATCH_STMTS}}} \"</a2ui>\"\n\
+                 stmt ::= data | ident \" = \" (component | datamap) | xtheme | xstyle | xdel\n\
+                 xstyle ::= \"style(\" XCLASS \", \" XSWORDS \")\"\n\
+                 xsep ::= \",\" (\" \" | xnl)?\n\
+                 xnl ::= \"\\n\" \" \"{{0,32}}\n",
                 lit("<a2ui>\n")
             ),
         };
@@ -448,7 +568,10 @@ impl<'a> Builder<'a> {
             comps.join(" | "),
             fnames.join(" | ")
         );
-        out.push_str(SHARED.trim_start());
+        out.push_str(&shared(&self.layout));
+        if !patch {
+            out.push_str(&ident_except(self.dialect, "xid", &["root"]));
+        }
         for (name, body) in &self.rules {
             out.push_str(&format!("{name} ::= {body}\n"));
         }
@@ -466,6 +589,100 @@ impl<'a> Builder<'a> {
             }
         }
     }
+}
+
+/// Rules `name ::= …` for an identifier (`ident`'s spelling) that is none of `words`: a trie over the
+/// words, every other character leaving it for any identifier of the length left. Lark has `&` and `~`.
+fn ident_except(dialect: Dialect, name: &str, words: &[&str]) -> String {
+    if dialect == Dialect::Lark {
+        let up = name.to_uppercase();
+        let not = words.iter().map(|w| lit(w)).collect::<Vec<_>>().join(" | ");
+        return format!("{name} ::= {up}\n{up} ::= IDENT & ~({not})\n");
+    }
+    const MAX: usize = 64;
+    let first: Vec<char> = ('A'..='Z').chain('a'..='z').chain(['_']).collect();
+    let rest: Vec<char> = ('0'..='9').chain(first.iter().copied()).collect();
+    let mut rules = Vec::new();
+    // depth-first over the prefixes some word has
+    fn node(
+        prefix: &str,
+        name: &str,
+        words: &[&str],
+        first: &[char],
+        rest: &[char],
+        rules: &mut Vec<String>,
+    ) -> String {
+        let depth = prefix.chars().count();
+        let rule = if depth == 0 {
+            name.to_owned()
+        } else {
+            format!("{name}{}", rules.len() + 1)
+        };
+        rules.push(String::new());
+        let slot = rules.len() - 1;
+        let mut next: Vec<char> = words
+            .iter()
+            .filter_map(|w| w.strip_prefix(prefix)?.chars().next())
+            .collect();
+        next.sort();
+        next.dedup();
+        let class = if depth == 0 { first } else { rest };
+        let others: Vec<char> = class.iter().copied().filter(|c| !next.contains(c)).collect();
+        let mut alts = vec![format!(
+            "{} [A-Za-z0-9_]{{0,{}}}",
+            char_class(&others),
+            MAX - depth - 1
+        )];
+        for c in next {
+            let child = node(&format!("{prefix}{c}"), name, words, first, rest, rules);
+            alts.push(format!("{} {child}", lit(&c.to_string())));
+        }
+        let body = alts.join(" | ");
+        rules[slot] = if depth > 0 && !words.contains(&prefix) {
+            format!("{rule} ::= ({body})?")
+        } else {
+            format!("{rule} ::= {body}")
+        };
+        rule
+    }
+    node("", name, words, &first, &rest, &mut rules);
+    rules.iter().map(|r| format!("{r}\n")).collect()
+}
+
+/// A GBNF class of exactly `chars` (ASCII).
+fn char_class(chars: &[char]) -> String {
+    let mut out = String::from("[");
+    let mut i = 0;
+    while i < chars.len() {
+        let mut j = i;
+        while j + 1 < chars.len() && chars[j + 1] as u32 == chars[j] as u32 + 1 {
+            j += 1;
+        }
+        out.push(chars[i]);
+        if j > i {
+            out.push('-');
+            out.push(chars[j]);
+        }
+        i = j + 1;
+    }
+    out + "]"
+}
+
+/// A screen's classes: `style(k1, …)`, then optionally `style(k2, …)`, and so on, each once.
+fn classes() -> String {
+    let mut out = String::from("xclasses ::= xk1\n");
+    for n in 1..=MAX_CLASSES {
+        let more = if n < MAX_CLASSES {
+            format!(" (\"\\n\" xk{})?", n + 1)
+        } else {
+            String::new()
+        };
+        out.push_str(&format!(
+            "xk{n} ::= {} XSWORDS \")\"{more}\n",
+            lit(&format!("style(k{n}, "))
+        ));
+    }
+    out
 }
 
 // ---- the at_exponential_express extension ----------------------------------------------------------
@@ -576,7 +793,7 @@ fn express_rules(dialect: Dialect) -> String {
     let mut r: Vec<(String, String)> = vec![
         (
             "xtheme".into(),
-            "\"theme(\" (string | xtarg (\",\" ws xtarg)*) \")\"".into(),
+            "\"theme(\" (string | xtarg (\",\" ws xtarg){0,63}) \")\"".into(),
         ),
         ("xtarg".into(), targ),
         // at most 8
@@ -587,17 +804,20 @@ fn express_rules(dialect: Dialect) -> String {
         // a colour literal, or the same in quotes; colour literals are valid nowhere else
         ("xcolor".into(), "XHEX | XQHEX".into()),
         ("XQHEX".into(), "\"\\\"\" XHEX \"\\\"\"".into()),
-        ("xcolors".into(), "\"{\" xckv (\",\" ws xckv)* \"}\"".into()),
+        ("xcolors".into(), "\"{\" xckv (\",\" ws xckv){0,63} \"}\"".into()),
         ("xckv".into(), "xcname \":\" ws xcolor".into()),
         ("xcname".into(), cname),
         (
             "xtval".into(),
             "XHEX | string | number | boolean | \"null\" | xtlist | xtmap".into(),
         ),
-        ("xtlist".into(), "\"[\" (xtval (\",\" ws xtval)*)? \"]\"".into()),
+        (
+            "xtlist".into(),
+            "\"[\" (xtval (\",\" ws xtval){0,63})? \"]\"".into(),
+        ),
         (
             "xtmap".into(),
-            "\"{\" (key \":\" ws xtval (\",\" ws key \":\" ws xtval)*)? \"}\"".into(),
+            "\"{\" (key \":\" ws xtval (\",\" ws key \":\" ws xtval){0,63})? \"}\"".into(),
         ),
     ];
     for (name, values) in THEME_CHOICES {
@@ -607,10 +827,9 @@ fn express_rules(dialect: Dialect) -> String {
         ));
     }
     r.extend([
-        ("xstyle".into(), "\"style(\" XCLASS \",\" ws XSWORDS \")\"".into()),
         ("xdel".into(), "\"del(\" (ident | abspath) \")\"".into()),
         ("xsval".into(), "XSWORDS | XCLASS".into()),
-        ("XSWORDS".into(), "\"\\\"\" XSITEM (\" \" XSITEM)* \"\\\"\"".into()),
+        ("XSWORDS".into(), "\"\\\"\" XSITEM (\" \" XSITEM){0,127} \"\\\"\"".into()),
         ("XSITEM".into(), "XSWORD | XCLASS".into()),
         ("XSWORD".into(), format!("(({states}) \":\")? XSBASE")),
         ("XSBASE".into(), style_word()),
@@ -620,12 +839,12 @@ fn express_rules(dialect: Dialect) -> String {
         ("XRNUMN".into(), "XNUM | \"-\" XTOKDOT".into()),
         ("XRTOKG".into(), "\"-\" XTOKNAME".into()),
         ("XRTOKN".into(), "\"-\" XTOKDOT".into()),
-        ("XTOKNAME".into(), "XTOKPART (\".\" XTOKPART)*".into()),
-        ("XTOKDOT".into(), "XTOKPART (\".\" XTOKPART)+".into()),
+        ("XTOKNAME".into(), "XTOKPART (\".\" XTOKPART){0,3}".into()),
+        ("XTOKDOT".into(), "XTOKPART (\".\" XTOKPART){1,3}".into()),
         ("XUNUM".into(), "XDIGITS (\".\" XDIGITS)?".into()),
         ("XNUM".into(), "\"-\"? XUNUM".into()),
-        ("XKF".into(), "\"\\\"\" XKLAYER (XKS? \";\" XKS? XKLAYER)* \"\\\"\"".into()),
-        ("XKLAYER".into(), "XKSHAPE (XKS? \"|\" XKS? XKTRACK)*".into()),
+        ("XKF".into(), "\"\\\"\" XKLAYER (XKS? \";\" XKS? XKLAYER){0,31} \"\\\"\"".into()),
+        ("XKLAYER".into(), "XKSHAPE (XKS? \"|\" XKS? XKTRACK){0,15}".into()),
         (
             "XKSHAPE".into(),
             [("circle", 3), ("ring", 4), ("rect", 5), ("star", 5)]
@@ -636,18 +855,18 @@ fn express_rules(dialect: Dialect) -> String {
         ),
         (
             "XKTRACK".into(),
-            "(\"scale\" | \"opacity\" | \"rotate\") XKS XKKEY (XKS XKKEY)+ (XKS XKEASE)? | \"move\" XKS XKMOVE (XKS XKMOVE)+ (XKS XKEASE)?".into(),
+            "(\"scale\" | \"opacity\" | \"rotate\") XKS XKKEY (XKS XKKEY){1,63} (XKS XKEASE)? | \"move\" XKS XKMOVE (XKS XKMOVE){1,63} (XKS XKEASE)?".into(),
         ),
         ("XKKEY".into(), "XUNUM \":\" XNUM".into()),
         ("XKMOVE".into(), "XUNUM \":\" XNUM \",\" XNUM".into()),
         ("XKEASE".into(), alts(KF_EASES.iter().map(|e| lit(e)))),
         ("XKCOLOR".into(), "\"$color.\" XKTOK | XKHEX".into()),
-        ("XKS".into(), "\" \"+".into()),
+        ("XKS".into(), "\" \"{1,8}".into()),
     ]);
     // the character classes, which the dialects spell differently
     if lark {
         r.extend([
-            ("XCLASS".into(), format!("IDENT & ~(XSBASE | {states})")),
+            ("XCLASS".into(), "/k([1-9]|[1-5][0-9]|6[0-4])/".into()),
             ("XDIGITS".into(), "/[0-9]{1,20}/".into()),
             ("XTOKPART".into(), "/[A-Za-z][A-Za-z0-9]{0,63}/".into()),
             ("XKTOK".into(), "/[A-Za-z0-9]{1,64}/".into()),
@@ -663,12 +882,13 @@ fn express_rules(dialect: Dialect) -> String {
             )
         };
         r.extend([
-            // GBNF has no complement: a class name here is any identifier, the compiler refuses one
-            // that reads as a word
-            ("XCLASS".into(), "ident".into()),
-            ("XDIGITS".into(), "[0-9]+".into()),
-            ("XTOKPART".into(), "[A-Za-z] [A-Za-z0-9]*".into()),
-            ("XKTOK".into(), "[A-Za-z0-9]+".into()),
+            (
+                "XCLASS".into(),
+                "\"k\" ([1-9] | [1-5] [0-9] | \"6\" [0-4])".into(),
+            ),
+            ("XDIGITS".into(), "[0-9]{1,20}".into()),
+            ("XTOKPART".into(), "[A-Za-z] [A-Za-z0-9]{0,63}".into()),
+            ("XKTOK".into(), "[A-Za-z0-9]{1,64}".into()),
             ("XHEX".into(), hex("[0-9a-fA-F]")),
             ("XKHEX".into(), hex("[0-9a-f]")),
         ]);

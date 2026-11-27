@@ -107,17 +107,12 @@ fn accepts_the_conformance_screens() {
         let messages = compiler.compile(case["input"].as_str().unwrap(), "main").unwrap();
         assert_eq!(Value::Array(messages.clone()), case["expect"], "{name}");
         let express = decompile(compiler.catalogs(), &messages, &options).unwrap();
-        // A reply builds one new surface `main`, `root` first, one component per statement: a case
-        // that changes a surface that exists, sets other surface extensions, or nests a component in
-        // its parent (the decompiler writes a child the compiler hoisted inline again) is not one.
+        // A reply builds one new surface `main`, `root` first: a case that changes a surface that
+        // exists or sets other surface extensions is not one.
         let body = express
             .strip_prefix("surface(\"main\")\n")
             .filter(|b| b.contains("root = "));
-        let nested = |b: &&str| {
-            b.lines()
-                .any(|l| l.matches("Text(").count() + l.matches("Column(").count() > 1)
-        };
-        let Some(body) = body.filter(|b| !b.contains("surface(") && !nested(b)) else {
+        let Some(body) = body.filter(|b| !b.contains("surface(")) else {
             skipped.push(name.to_owned());
             continue;
         };
@@ -129,13 +124,12 @@ fn accepts_the_conformance_screens() {
     assert_eq!(
         skipped,
         [
-            "style_on_an_inline_child",
             "theme_on_an_existing_surface_calls_set_theme",
             "theme_alone_on_an_existing_surface",
             "theme_beside_other_surface_extensions",
         ]
     );
-    assert_eq!(replayed, 26);
+    assert_eq!(replayed, 27);
 }
 
 /// The `theme(...)` and `style(...)` lines of the cases as they are written there (aliases, quoted
@@ -161,12 +155,11 @@ fn accepts_the_theme_and_style_lines_as_written() {
     }
     assert!(lines.len() >= 12, "{lines:?}");
     for line in &lines {
-        // a class is used once, so the screen means the same
-        let class = line
-            .strip_prefix("style(")
-            .and_then(|l| l.split(',').next())
-            .map(|c| format!(", s={c}"))
-            .unwrap_or_default();
+        // a class is used once, so the screen means the same; the grammar names it `k1`
+        let (line, class) = match line.strip_prefix("style(").and_then(|l| l.split_once(',')) {
+            Some((_, words)) => (format!("style(k1,{words}"), ", s=k1"),
+            None => (line.clone(), ""),
+        };
         let reply = screen(&format!("{line}\nroot = Text(text=\"x\"{class})"));
         g.accept(&reply);
         catalog
@@ -175,11 +168,16 @@ fn accepts_the_theme_and_style_lines_as_written() {
     }
 }
 
-/// Positional arguments of the patch cases, by keyword (the grammar's spelling).
+/// Positional arguments of the patch cases, by keyword, and their class `card` named `k1` (the
+/// grammar's spelling).
 fn keyword_args(patch: &str) -> String {
-    patch
+    canonical_class(patch)
         .replace("Text(\"", "Text(text=\"")
         .replace("Column([", "Column(children=[")
+}
+
+fn canonical_class(text: &str) -> String {
+    text.replace("style(card,", "style(k1,").replace("s=card", "s=k1")
 }
 
 #[test]
@@ -192,7 +190,8 @@ fn accepts_the_conformance_patches() {
         if case.get("expect_error").is_some() {
             continue;
         }
-        let screen = case["screen"].as_str().unwrap();
+        let screen = canonical_class(case["screen"].as_str().unwrap());
+        let screen = screen.as_str();
         let patch = keyword_args(case["patch"].as_str().unwrap());
         let reply = format!("<a2ui>\n{patch}\n</a2ui>");
         g.accept(&reply);
@@ -240,17 +239,15 @@ fn refuses_what_the_compiler_refuses() {
         "theme(base=\"dark\", charts=[#111111, #222222], stroke=1.5, scale=1.25, light={ring: \"#ff00ff\"}, recipes={Heading: {weight: 700}})\nroot = Text(text=\"x\")",
     );
 
-    // GBNF writes a class name as any identifier; only Lark knows it may not read as a word.
-    let gbnf_cannot = [
-        "style(col, \"p8\")\nroot = Text(text=\"x\", s=col)",
-        "style(hover, \"p8\")\nroot = Text(text=\"x\")",
-    ];
-    for bad in gbnf_cannot {
-        assert!(catalog.validate(&screen(bad)).is_err(), "{bad}");
-        g.refuse(&screen(bad), false);
-    }
     // The compiler takes these too; the grammar keeps to the canonical spelling.
     for bad in [
+        // classes are `k1`, `k2`, … in order, before `root`
+        "style(card, \"p8\")\nroot = Text(text=\"x\", s=card)",
+        "style(k2, \"p8\")\nroot = Text(text=\"x\", s=k2)",
+        "style(k1, \"p8\")\nstyle(k1, \"p4\")\nroot = Text(text=\"x\", s=k1)",
+        "style(k1, \"p8\")\nstyle(k3, \"p4\")\nroot = Text(text=\"x\", s=k1)",
+        "root = Text(text=\"x\")\nstyle(k1, \"p8\")",
+        "style(k1, \"p8\")\n$/a = 1\nroot = Text(text=$/a, s=k1)",
         "root = Text(text=\"x\")\ntheme(primary=#2563eb)", // a theme goes before root
         "root = Text(text=\"x\", s=\"p8  p4\")",
         "root = Text(text=\"x\", s=\"\")",
@@ -300,7 +297,9 @@ fn refuses_what_the_compiler_refuses() {
         "root = Text(text=\"x\", s=\"active:p8\")",
         "root = Text(text=\"x\", s=1)",
         "root = Text(text=\"x\", s=\"p8\", s2=\"p4\")",
-        // style() takes a name and words
+        // style() takes a name and words; a class may not read as a word
+        "style(col, \"p8\")\nroot = Text(text=\"x\", s=col)",
+        "style(hover, \"p8\")\nroot = Text(text=\"x\")",
         "style(card)\nroot = Text(text=\"x\")",
         "style(card, \"p8 nope-1\")\nroot = Text(text=\"x\")",
         // del() is a patch's
