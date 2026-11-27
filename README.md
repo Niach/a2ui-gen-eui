@@ -63,8 +63,15 @@ trained on others, so expect valid but less fitting screens.
 compiler reads: `theme(...)` before `root` (`#rrggbb[aa]` colours only there), `style(name, "words")`,
 `s="col g12 p16 bg-card"` / `s=<class>`, `enter=` / `exit=` / `stagger=` / `delay=`, Motion `ref=` and
 `kf=`. `grammar::lark_patch` / `grammar::gbnf_patch` (`Catalog::lark_patch`) take a patch, with `del(name)`
-and `del($/path)`. In GBNF a style class name is any identifier; the Lark grammar also refuses one that reads
-as a shorthand word. eui's built-in catalog does not declare the extension, so its grammar is unchanged.
+and `del($/path)`. A screen defines its classes the way the decompiler names them, `style(k1, …)`, `style(k2, …)`, … in order
+between its data and `root`. Style strings hold only the style table's words and those names. A patch may also break a
+statement over indented lines. eui's built-in catalog does not declare the extension.
+
+**Bounded, ASCII syntax.** Identifiers are `[A-Za-z_][A-Za-z0-9_]{0,63}`, so a lookalike such as `＝`, `（` or `，`
+can appear only inside a string. A child may be written inline where an id goes. Every repetition has a bound
+(names, numbers, strings, list items, arguments, statements), so a model caught in a loop hits the end of the grammar
+before its token limit. `cargo run -p a2ui-gen-eui --no-default-features --example grammars -- catalog.json gen.gbnf patch.gbnf`
+writes a catalog's GBNF.
 
 Without the default feature `llama` the crate has no native code: prompts, grammars (`grammar::gbnf` for
 llama.cpp and vLLM, `grammar::lark` for llguidance), streaming and validation.

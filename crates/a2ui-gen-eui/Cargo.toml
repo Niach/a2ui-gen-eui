@@ -47,5 +47,8 @@ required-features = ["llama"]
 name = "generate"
 required-features = ["llama"]
 
+[[example]]
+name = "grammars"
+
 [dev-dependencies]
 toktrie = "1.7.5"

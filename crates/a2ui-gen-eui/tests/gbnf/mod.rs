@@ -1,5 +1,5 @@
 //! A small GBNF recognizer, so the tests check the llama.cpp spelling of the grammar too: it reads the
-//! subset [`a2ui_gen_eui::grammar::gbnf`] writes (literals, `[…]` classes, rule names, groups, `? * +`)
+//! subset [`a2ui_gen_eui::grammar::gbnf`] writes (literals, `[…]` classes, rule names, groups, `? * +` and `{m,n}`)
 //! and tells whether the start rule `root` matches a whole text.
 
 use std::collections::{BTreeSet, HashMap};
@@ -70,6 +70,19 @@ impl Reader<'_> {
         }
         Node::Alt(alts)
     }
+    /// `{m}`, `{m,}` or `{m,n}`, read to its end.
+    fn range(&mut self) -> (usize, Option<usize>) {
+        let close = self.i + self.s[self.i..].iter().position(|&c| c == '}').unwrap();
+        let body: String = self.s[self.i + 1..close].iter().collect();
+        self.i = close + 1;
+        let num = |t: &str| t.trim().parse::<usize>().unwrap();
+        match body.split_once(',') {
+            None => (num(&body), Some(num(&body))),
+            Some((m, n)) if n.trim().is_empty() => (num(m), None),
+            Some((m, n)) => (num(m), Some(num(n))),
+        }
+    }
+
     fn seq(&mut self) -> Vec<Item> {
         let mut items = Vec::new();
         loop {
@@ -122,14 +135,17 @@ impl Reader<'_> {
                 Some(c) => panic!("unexpected {c:?} in GBNF"),
             };
             let (min, max) = match self.peek() {
-                Some('?') => (0, Some(1)),
-                Some('*') => (0, None),
-                Some('+') => (1, None),
+                Some('{') => self.range(),
+                Some(c @ ('?' | '*' | '+')) => {
+                    self.i += 1;
+                    match c {
+                        '?' => (0, Some(1)),
+                        '*' => (0, None),
+                        _ => (1, None),
+                    }
+                }
                 _ => (1, Some(1)),
             };
-            if (min, max) != (1, Some(1)) {
-                self.i += 1;
-            }
             items.push(Item { node, min, max });
         }
     }
@@ -164,11 +180,21 @@ impl Gbnf {
     }
 
     /// Whether `root` matches all of `text`.
+    #[allow(dead_code)]
     pub fn accepts(&self, text: &str) -> bool {
+        self.check(text).is_ok()
+    }
+
+    /// `Err` with the farthest character a terminal reached when `root` does not match all of `text`.
+    #[allow(dead_code)]
+    pub fn check(&self, text: &str) -> Result<(), usize> {
         let input: Vec<char> = text.chars().collect();
         let mut memo = HashMap::new();
-        self.node(&Node::Rule("root".into()), &input, 0, &mut memo)
-            .contains(&input.len())
+        let ends = self.node(&Node::Rule("root".into()), &input, 0, &mut memo);
+        if ends.contains(&input.len()) {
+            return Ok(());
+        }
+        Err(memo.values().flatten().copied().max().unwrap_or(0))
     }
 
     fn node(
